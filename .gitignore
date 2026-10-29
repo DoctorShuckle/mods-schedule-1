@@ -16,5 +16,8 @@ decompiled/**
 third-party/
 
 # Machine-specific settings
-etc/local.sh
+etc/local.json
 .vscode/
+
+# Script logs
+logs/

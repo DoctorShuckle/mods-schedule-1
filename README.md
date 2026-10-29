@@ -30,7 +30,19 @@ lib/
 
 Roughly: install the matching MelonLoader build on the game branch you want, launch once, then copy the
 files above. Check each `.csproj` under `mods/` for the exact assemblies it references. You only need the
-folders for the flavour you are building.
+folders for the flavor you are building.
+
+### Build
+
+Build with the Python scripts (Python 3.8+, the .NET SDK on your `PATH` or in `~/.dotnet`):
+
+```bash
+scripts/build.py                                       # every mod, both flavors
+scripts/build.py -m persistent-pot-additives -f il2cpp # one mod and flavor
+```
+
+Output goes to `out/<mod>/<flavor>/`. Copy the resulting DLL into the game's `Mods` folder. Plain
+`dotnet build` works too:
 
 ```bash
 dotnet build mods/persistent-pot-additives/src/mono -c Release -o out/persistent-pot-additives/mono       # Mono branch
@@ -40,14 +52,37 @@ dotnet build mods/persistent-pot-additives/src/il2cpp -c Release -o out/persiste
 `decompiled/` is likewise an empty skeleton for optional `ilspycmd` output (handy for reading game code,
 not needed to build).
 
-Output goes to `out/<mod>/<flavour>/`. Copy the resulting DLL into the game's `Mods` folder.
+## Scripts
 
-## Optional: deploy scripts
+All scripts live in `scripts/`, take `-h` and `-v/--verbose`, and share a `-m/--mod` and `-f/--flavor`
+pair (`mono` or `il2cpp`). A `Makefile` wraps them; run `make help` for the list.
 
-`scripts/deploy.sh <mod> <flavour>` (for example `scripts/deploy.sh persistent-pot-additives il2cpp`) builds a project and `scp`s the DLL to a game install on another machine;
-`scripts/log.sh` pulls MelonLoader's `Latest.log` back. Copy `etc/local.example.sh` to
-`etc/local.sh` and fill in your host and game path. Not needed if you build and play on the
-same machine.
+| Script        | Make target                              | What it does                                                          |
+| ------------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| `build.py`    | `make build [MOD=… FLAVOR=…]`            | Builds mods; with no `-m`/`-f` it builds everything.                  |
+| `bundle.py`   | `make bundle MOD=… FLAVOR=… [VERSION=…]` | Builds and zips to `out/bundles/<mod>-<flavor>-<version>.zip`.        |
+| `deploy.py`   | `make deploy MOD=… FLAVOR=…`             | Builds and `scp`s the DLL to the game PC (see below).                 |
+| `log.py`      | `make log`                               | Fetches MelonLoader's `Latest.log` from the game PC and prints it.    |
+
+`make clean` removes `out/`; `make clean-logs` removes `logs/`.
+
+### Bundling for release
+
+`scripts/bundle.py -m <mod> -f <flavor> [-V <version>]` (version defaults to `git describe --always --dirty`)
+produces a zip whose root mirrors the game folder (`Mods/<Mod>.dll`), so it can be dropped straight onto
+Vortex or unzipped into the game directory.
+
+### Deploying to another machine
+
+`deploy.py` and `log.py` copy files over `scp` to a game install on another machine. Copy
+`etc/local.example.json` to `etc/local.json` (gitignored) and fill in `win_host` and `win_game_dir`. Not
+needed if you build and play on the same machine.
+
+### Logs
+
+Every script logs to the console (info to stdout, warnings and errors to stderr) and to `logs/`
+(gitignored): `<script>.log` is overwritten on each run, and `<script>-<timestamp>.log` is kept as history.
+Lines look like `[2026-10-29 16:30:28 INFO] message`.
 
 ## License
 

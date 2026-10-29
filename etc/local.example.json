@@ -1,0 +1,5 @@
+{
+  "_comment": "Copy to etc/local.json and edit. Only needed for deploy.py / log.py (copying to a remote game PC over scp).",
+  "win_host": "user@windows-pc",
+  "win_game_dir": "/C:/Program Files (x86)/Steam/steamapps/common/Schedule I"
+}
