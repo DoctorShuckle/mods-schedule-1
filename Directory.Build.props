@@ -1,0 +1,15 @@
+<Project>
+
+  <!-- Shared paths for every project in this repo. -->
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <!-- Game and MelonLoader reference DLLs pulled from the Windows install (see scripts/). -->
+    <LibDir>$(RepoRoot)lib/</LibDir>
+    <!-- Mods live at mods/<mod>/src/<flavour>/<flavour>.csproj; <mod> is the folder two levels up. -->
+    <ModName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))))</ModName>
+    <!-- All build output goes under out/<mod>/<project>/, intermediates under out/obj/<mod>/<project>/. -->
+    <BaseOutputPath>$(RepoRoot)out/$(ModName)/$(MSBuildProjectName)/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(RepoRoot)out/obj/$(ModName)/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+</Project>

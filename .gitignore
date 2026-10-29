@@ -1,0 +1,20 @@
+out/
+bin/
+obj/
+Latest.log
+
+# Game, loader and other people's code: never commit.
+# Contents are ignored but the folder skeleton is kept via a README.md (a plain `lib/` rule
+# would hide the folder itself and make the README un-trackable).
+lib/**
+decompiled/**
+!lib/**/
+!decompiled/**/
+!lib/*/README.md
+!decompiled/*/README.md
+
+third-party/
+
+# Machine-specific settings
+etc/local.sh
+.vscode/
