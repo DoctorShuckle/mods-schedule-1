@@ -60,11 +60,28 @@ pair (`mono` or `il2cpp`). A `Makefile` wraps them; run `make help` for the list
 | Script        | Make target                              | What it does                                                          |
 | ------------- | ---------------------------------------- | --------------------------------------------------------------------- |
 | `build.py`    | `make build [MOD=… FLAVOR=…]`            | Builds mods; with no `-m`/`-f` it builds everything.                  |
+| `test.py`     | `make test [MOD=…]`                      | Runs each mod's unit tests (`mods/<mod>/tests/`).                     |
 | `bundle.py`   | `make bundle MOD=… FLAVOR=… [VERSION=…]` | Builds and zips to `out/bundles/<mod>-<flavor>-<version>.zip`.        |
 | `deploy.py`   | `make deploy MOD=… FLAVOR=…`             | Builds and `scp`s the DLL to the game PC (see below).                 |
 | `log.py`      | `make log`                               | Fetches MelonLoader's `Latest.log` from the game PC and prints it.    |
 
 `make clean` removes `out/`; `make clean-logs` removes `logs/`.
+
+### Testing
+
+```bash
+scripts/test.py                          # every mod's tests
+scripts/test.py -m persistent-pot-additives -k "FullyQualifiedName~Canary"   # one mod, filtered
+```
+
+Each mod's `tests/` project has two kinds of test:
+
+- **Logic tests** cover the mod's decisions (`Decisions.cs`), which use no game types, so they run anywhere.
+- **Canary tests** read the game DLLs in `lib/` (metadata only; nothing is run) and fail if a member the
+  mod depends on has been renamed or removed. After a game update, refresh `lib/` and run the tests to
+  find out before launching the game. They skip themselves when `lib/` is empty.
+
+Neither kind proves the mod behaves correctly in the game; that still needs a run in-game.
 
 ### Bundling for release
 

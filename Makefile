@@ -5,10 +5,11 @@ FLAVOR ?=
 VERSION ?=
 
 .DEFAULT_GOAL := help
-.PHONY: help build bundle deploy log clean clean-logs
+.PHONY: help build test bundle deploy log clean clean-logs
 
 help:
 	@echo "make build   [MOD=<mod>] [FLAVOR=mono|il2cpp]   build (default: every mod and flavor)"
+	@echo "make test    [MOD=<mod>]                        run the unit tests (default: every mod)"
 	@echo "make bundle  MOD=<mod> FLAVOR=<f> [VERSION=<v>] build and zip to out/bundles/"
 	@echo "make deploy  MOD=<mod> FLAVOR=<f>               build and scp the DLL to the game PC"
 	@echo "make log                                         fetch and print MelonLoader's Latest.log"
@@ -17,6 +18,9 @@ help:
 
 build:
 	$(PYTHON) scripts/build.py $(if $(MOD),-m $(MOD)) $(if $(FLAVOR),-f $(FLAVOR))
+
+test:
+	$(PYTHON) scripts/test.py $(if $(MOD),-m $(MOD))
 
 bundle: require-mod-flavor
 	$(PYTHON) scripts/bundle.py -m $(MOD) -f $(FLAVOR) $(if $(VERSION),-V $(VERSION))

@@ -49,13 +49,11 @@ namespace PersistentPotAdditives
 
             try
             {
-                // Only the host decides. Every machine runs this handler, but the host's restore
-                // is broadcast to everyone, so clients must stay out of it.
-                if (__instance == null || !GameAccess.IsServer) return;
-
-                // The game's own handler does nothing when there is no plant (it can be signalled
-                // twice); mirror that so we never restore after a no-op.
-                if (!GameAccess.HasPlant(__instance)) return;
+                // Only the host decides (every machine runs this handler, but the host's restore
+                // is broadcast to everyone), and only if the game's handler will really run: it
+                // does nothing without a plant, and can be signalled twice.
+                if (__instance == null) return;
+                if (!Decisions.ShouldCapture(GameAccess.IsServer, GameAccess.HasPlant(__instance))) return;
 
                 // Copy now: the game empties its list a few lines into the handler.
                 __state = GameAccess.AppliedAdditiveIds(__instance);
@@ -75,24 +73,22 @@ namespace PersistentPotAdditives
         {
             try
             {
-                if (__instance == null || __state == null || __state.Count == 0) return;
+                if (__instance == null || __state == null) return;
 
                 // The handler has already decremented the uses, so this is "uses left for the
                 // NEXT plant". At zero the game has cleared the soil itself (ClearSoil also clears
                 // additives) and that is exactly when additives should end.
                 int usesLeft = GameAccess.RemainingUses(__instance);
-                if (usesLeft <= 0)
+                if (!Decisions.ShouldRestore(__state.Count, usesLeft))
                 {
-                    ModLog.Verbose("Soil is spent; leaving additives cleared (" + __state.Count + " dropped).");
+                    ModLog.Verbose("Nothing to restore (" + __state.Count + " captured, " + usesLeft + " soil use(s) left).");
                     return;
                 }
 
                 int restored = 0;
-                foreach (string id in __state)
+                // Skips anything already back on the pot, so nothing is applied twice.
+                foreach (string id in Decisions.IdsToRestore(__state, id => GameAccess.IsApplied(__instance, id)))
                 {
-                    // Cheap safety net: never double-apply if something already put it back.
-                    if (GameAccess.IsApplied(__instance, id)) continue;
-
                     GameAccess.ApplyAdditive(__instance, id);
                     restored++;
                 }
@@ -129,24 +125,19 @@ namespace PersistentPotAdditives
         {
             try
             {
+                // Cheap early exit for clients; ShouldBoost checks it again with the rest.
                 if (__instance == null || !GameAccess.IsServer) return;
-
-                // The game plants saved plants through this same method when a save loads. Those
-                // already have their progress saved; boosting them would add growth on every load.
-                if (GameAccess.IsLoadingSave) return;
-
-                // Fresh plantings (player and NPC) always pass 0. Anything else is a restored
-                // plant, so this is a second guard on top of the loading check.
-                if (normalizedSeedProgress > 0f) return;
 
                 // The game refuses some seeds; no plant means nothing to boost.
                 Plant plant = __instance.Plant;
-                if (plant == null) return;
-
                 float boost = GameAccess.TotalInstantGrowth(__instance);
-                if (boost <= 0f)
+
+                // Saved plants are re-planted through this same method when a save loads, with
+                // their progress already saved; boosting them would add growth on every load.
+                if (!Decisions.ShouldBoost(true, GameAccess.IsLoadingSave, normalizedSeedProgress, plant != null, boost))
                 {
-                    ModLog.Verbose("New plant, no growth additive on the pot.");
+                    ModLog.Verbose("No replant boost (progress " + normalizedSeedProgress.ToString("0.###") +
+                                   ", plant " + (plant != null) + ", pot boost " + boost.ToString("0.###") + ").");
                     return;
                 }
 

@@ -70,16 +70,16 @@ namespace PersistentPotAdditives
         /// </summary>
         public static float TotalInstantGrowth(Pot pot)
         {
-            float total = 0f;
+            var boosts = new List<float>();
             var applied = pot.AppliedAdditives;
-            if (applied == null) return total;
+            if (applied == null) return 0f;
 
             for (int i = 0; i < applied.Count; i++)
             {
                 AdditiveDefinition additive = applied[i];
-                if (additive != null && additive.InstantGrowth > 0f) total += additive.InstantGrowth;
+                if (additive != null) boosts.Add(additive.InstantGrowth);
             }
-            return total;
+            return Decisions.TotalGrowth(boosts);
         }
 
         public static bool IsApplied(Pot pot, string additiveId) => pot.IsAdditiveApplied(additiveId);

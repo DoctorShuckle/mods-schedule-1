@@ -1,6 +1,7 @@
 out/
 bin/
 obj/
+__pycache__/
 Latest.log
 
 # Game, loader and other people's code: never commit.
