@@ -13,6 +13,7 @@ both the **Mono** and **IL2CPP** branches of the game.
 | Mod                                                                                    | What it does                                                                                                                  |
 | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | [Persistent Pot Additives](mods/persistent-pot-additives/README.md) | Additives on a pot last as long as the soil, instead of being wiped after every harvest. Host-only, saves no data of its own. |
+| [Configurable Employees](mods/configurable-employees/README.md) | Tune employee wages, signing fees, walk speed, work speed, assignment limits, the Fixer's fee and per-property capacity. Does nothing until configured. |
 
 ## Building
 
