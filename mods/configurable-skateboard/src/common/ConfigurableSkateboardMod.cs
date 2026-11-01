@@ -20,9 +20,10 @@ using ConfigurableSkateboard;
 //
 // A board's physics read one settings object (SkateboardSettings) on every step. The game builds
 // it from the board's default data, and rebuilds it on every weather change to blend in the rain.
-// The mod multiplies three of its values (top speed, push force, jump force) right after each
-// build (SkateboardPatches, BoardTuner). A push spends stamina through PlayerMovement.ChangeStamina,
-// so while riding the mod scales any spend there. No game code is replaced and nothing is saved.
+// The mod multiplies some of its values (top speed, push force, jump force, sideways grip and the
+// coasting drag curve) right after each build (SkateboardPatches, BoardTuner), and can switch off the
+// board's terrain slowdown. A push spends stamina through PlayerMovement.ChangeStamina, so while
+// riding the mod scales any spend there. No game code is replaced and nothing is saved.
 //
 // Not reachable without rewriting game code: the stamina needed to start a push (12.5), the
 // jump charge time and the mount and dismount momentum. They are constants the compiler inlined.

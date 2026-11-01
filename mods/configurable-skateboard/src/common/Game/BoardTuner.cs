@@ -35,7 +35,12 @@ namespace ConfigurableSkateboard
         {
             try
             {
-                if (board == null || !GameAccess.UsesSharedDefault(board)) return;
+                if (board == null) return;
+
+                // A per-board switch, not part of the settings object, so set it every time.
+                if (!ModConfig.SlowOnTerrain) board.SlowOnTerrain = false;
+
+                if (!GameAccess.UsesSharedDefault(board)) return;
 
                 SkateboardSettings own = GameAccess.CopyOfSettings(GameAccess.Settings(board));
                 Scale(own);
@@ -53,6 +58,9 @@ namespace ConfigurableSkateboard
             settings.TopSpeed_Kmh *= ModConfig.TopSpeed;
             settings.PushForceMultiplier *= ModConfig.PushForce;
             settings.JumpForce *= ModConfig.JumpForce;
+            settings.LateralFrictionForceMultiplier *= ModConfig.DriftGrip;
+            // The settings are a private copy here, and so is the curve (copying makes a new curve).
+            GameAccess.ScaleCurve(settings.LongitudinalFrictionCurve, ModConfig.CoastDrag);
         }
     }
 }

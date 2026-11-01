@@ -43,6 +43,26 @@ namespace ConfigurableSkateboard
 
         public static SkateboardSettings CopyOfSettings(SkateboardSettings settings) => settings.Clone();
 
+        /// <summary>
+        /// Multiplies every key of the curve (its values and slopes, so the shape is kept). The caller
+        /// must own the curve: the game's shared one would change for every board.
+        /// </summary>
+        public static void ScaleCurve(AnimationCurve curve, float factor)
+        {
+            if (curve == null || factor == 1f) return;
+
+            var keys = curve.keys; // a copy: write it back to change the curve
+            for (int i = 0; i < keys.Length; i++)
+            {
+                Keyframe key = keys[i];
+                key.value *= factor;
+                key.inTangent *= factor;
+                key.outTangent *= factor;
+                keys[i] = key;
+            }
+            curve.keys = keys;
+        }
+
         /// <summary>True while the local player is standing on a board.</summary>
         public static bool IsRiding
         {

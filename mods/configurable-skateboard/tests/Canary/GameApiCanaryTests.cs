@@ -50,6 +50,9 @@ namespace ConfigurableSkateboard.Tests
             System.Type settings = game.GameType("Experimental.SkateboardSettings");
             foreach (string name in new[] { "TopSpeed_Kmh", "PushForceMultiplier", "JumpForce" })
                 Assert.Equal("Single", GameApi.ValueType(settings, name, isStatic: false)?.Name);
+            Assert.Equal("Single", GameApi.ValueType(settings, "LateralFrictionForceMultiplier", isStatic: false)?.Name);
+            Assert.Equal("AnimationCurve", GameApi.ValueType(settings, "LongitudinalFrictionCurve", isStatic: false)?.Name);
+            Assert.Equal("Boolean", GameApi.ValueType(game.GameType("Skating.Skateboard"), "SlowOnTerrain", isStatic: false)?.Name);
             Assert.NotNull(settings.GetMethod("Clone", BindingFlags.Public | BindingFlags.Instance));
 
             System.Type board = game.GameType("Skating.Skateboard");

@@ -13,8 +13,14 @@ namespace ConfigurableSkateboard
         private static MelonPreferences_Entry<float> _pushForce;
         private static MelonPreferences_Entry<float> _jumpForce;
         private static MelonPreferences_Entry<float> _pushStamina;
+        private static MelonPreferences_Entry<float> _driftGrip;
+        private static MelonPreferences_Entry<float> _coastDrag;
+        private static MelonPreferences_Entry<bool> _slowOnTerrain;
         private static MelonPreferences_Entry<bool> _verbose;
 
+        public static float DriftGrip { get; private set; } = 1f;
+        public static float CoastDrag { get; private set; } = 1f;
+        public static bool SlowOnTerrain { get; private set; } = true;
         public static float TopSpeed { get; private set; } = 1.5f;
         public static float PushForce { get; private set; } = 1.5f;
         public static float JumpForce { get; private set; } = 1.5f;
@@ -32,6 +38,12 @@ namespace ConfigurableSkateboard
                 "Multiplies the upward force of a jump, so jump height. 1 = as in the game.");
             _pushStamina = category.CreateEntry("PushStaminaMultiplier", 0.5f, "Push stamina cost multiplier",
                 "Multiplies the stamina a push spends (12.5 in the game); 0 makes pushing free. You still need 12.5 stamina to start a push: that check is fixed in the game. 1 = as in the game.");
+            _driftGrip = category.CreateEntry("DriftGripMultiplier", 1f, "Drift grip multiplier",
+                "Multiplies how hard the board resists sliding sideways. Below 1 the board drifts; above 1 it carves and stops sliding sooner. 1 = as in the game.");
+            _coastDrag = category.CreateEntry("CoastDragMultiplier", 1f, "Coast drag multiplier",
+                "Multiplies the drag that slows the board when you stop pushing. Below 1 you coast farther; above 1 you slow sooner. 1 = as in the game.");
+            _slowOnTerrain = category.CreateEntry("SlowOnTerrain", true, "Slow on terrain",
+                "true keeps the game's extra drag on grass and dirt; false rides them as fast as pavement.");
             _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
                 "Log each board the mod tunes. Turn on when reporting a problem.");
         }
@@ -45,6 +57,9 @@ namespace ConfigurableSkateboard
             PushForce = Tuning.Multiplier(_pushForce.Value);
             JumpForce = Tuning.Multiplier(_jumpForce.Value);
             PushStamina = Tuning.CostMultiplier(_pushStamina.Value);
+            DriftGrip = Tuning.Multiplier(_driftGrip.Value);
+            CoastDrag = Tuning.Multiplier(_coastDrag.Value);
+            SlowOnTerrain = _slowOnTerrain.Value;
             ModLog.VerboseEnabled = _verbose.Value;
         }
     }

@@ -9,3 +9,4 @@ global using ScheduleOne.Experimental;
 global using ScheduleOne.PlayerScripts;
 global using ScheduleOne.Skating;
 #endif
+global using UnityEngine;
