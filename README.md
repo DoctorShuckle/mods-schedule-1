@@ -15,6 +15,7 @@ both the **Mono** and **IL2CPP** branches of the game.
 | [Persistent Pot Additives](mods/persistent-pot-additives/README.md) | Additives on a pot last as long as the soil, instead of being wiped after every harvest. Host-only, saves no data of its own. |
 | [Configurable Employees](mods/configurable-employees/README.md) | Tune employee wages, signing fees, walk speed, work speed, assignment limits, the Fixer's fee and per-property capacity. Does nothing until configured. |
 | [Tidy Stations](mods/tidy-stations/README.md) | Stops work leaving trash: station packaging, botanists' empty bags and packets, and plant scrap. Each kind can be switched back on; map trash is untouched. |
+| [Tidy Streets](mods/tidy-streets/README.md) | Stops the map's own trash from spawning and clears the world's trash each time a save loads. Each part can be switched off. |
 
 ## Building
 

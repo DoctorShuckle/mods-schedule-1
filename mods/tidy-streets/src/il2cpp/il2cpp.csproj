@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- IL2CPP build: same source, compiled against MelonLoader's generated Il2Cpp* proxy assemblies. -->
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+    <AssemblyName>TidyStreets</AssemblyName>
+    <RootNamespace>TidyStreets</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <DebugType>none</DebugType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
+    <SrcDir>$(MSBuildThisFileDirectory)..\</SrcDir>
+    <GameLibDir>$(LibDir)il2cpp\</GameLibDir>
+    <LoaderLibDir>$(LibDir)melonloader-il2cpp\</LoaderLibDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SrcDir)common\**\*.cs" />
+  </ItemGroup>
+
+  <!-- No Newtonsoft.Json: the mod stores nothing on disk. -->
+  <ItemGroup>
+    <Reference Include="MelonLoader" HintPath="$(LoaderLibDir)MelonLoader.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(LoaderLibDir)0Harmony.dll" Private="false" />
+    <Reference Include="Il2CppInterop.Runtime" HintPath="$(LoaderLibDir)Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="Il2Cppmscorlib" HintPath="$(GameLibDir)Il2Cppmscorlib.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(GameLibDir)Assembly-CSharp.dll" Private="false" />
+    <Reference Include="Il2CppScheduleOne.Core" HintPath="$(GameLibDir)Il2CppScheduleOne.Core.dll" Private="false" />
+    <Reference Include="Il2CppFishNet.Runtime" HintPath="$(GameLibDir)Il2CppFishNet.Runtime.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(GameLibDir)UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameLibDir)UnityEngine.CoreModule.dll" Private="false" />
+  </ItemGroup>
+
+</Project>
