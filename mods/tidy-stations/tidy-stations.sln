@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{97C60A03-5A5C-4208-8BF8-F655418A715D}") = "src", "src", "{EC3643E3-A260-4A4B-8B52-7BC2BB16F577}"
+EndProject
+Project("{D72B0BB4-4E0B-43C3-A88C-B2D4FCE04E25}") = "mono", "src\mono\mono.csproj", "{AF79EA75-48CD-498A-A350-6D0EB75FE341}"
+EndProject
+Project("{D72B0BB4-4E0B-43C3-A88C-B2D4FCE04E25}") = "il2cpp", "src\il2cpp\il2cpp.csproj", "{0B823FA2-105D-4BFE-823D-DB5949F8FA85}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF79EA75-48CD-498A-A350-6D0EB75FE341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF79EA75-48CD-498A-A350-6D0EB75FE341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF79EA75-48CD-498A-A350-6D0EB75FE341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF79EA75-48CD-498A-A350-6D0EB75FE341}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B823FA2-105D-4BFE-823D-DB5949F8FA85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B823FA2-105D-4BFE-823D-DB5949F8FA85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B823FA2-105D-4BFE-823D-DB5949F8FA85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B823FA2-105D-4BFE-823D-DB5949F8FA85}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AF79EA75-48CD-498A-A350-6D0EB75FE341} = {EC3643E3-A260-4A4B-8B52-7BC2BB16F577}
+		{0B823FA2-105D-4BFE-823D-DB5949F8FA85} = {EC3643E3-A260-4A4B-8B52-7BC2BB16F577}
+	EndGlobalSection
+EndGlobal
