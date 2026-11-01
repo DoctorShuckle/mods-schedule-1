@@ -79,7 +79,7 @@ namespace PersistentPotAdditives
                 AdditiveDefinition additive = applied[i];
                 if (additive != null) boosts.Add(additive.InstantGrowth);
             }
-            return Decisions.TotalGrowth(boosts);
+            return ReplantBoost.TotalGrowth(boosts);
         }
 
         public static bool IsApplied(Pot pot, string additiveId) => pot.IsAdditiveApplied(additiveId);
