@@ -17,6 +17,8 @@ both the **Mono** and **IL2CPP** branches of the game.
 | [Tidy Stations](mods/tidy-stations/README.md) | Stops work leaving trash: station packaging, botanists' empty bags and packets, and plant scrap. Each kind can be switched back on; map trash is untouched. |
 | [Tidy Streets](mods/tidy-streets/README.md) | Stops the map's own trash from spawning and clears the world's trash each time a save loads. Each part can be switched off. |
 | [Configurable Skateboard](mods/configurable-skateboard/README.md) | Tune the skateboard's top speed, push force, jump force and push stamina cost with multipliers. |
+| [Warehouse Access](mods/warehouse-access/README.md) | Opens the Dark Market warehouse without the knock, at every hour, once its quest is done. Optionally by rank instead. |
+| [Configurable ATM](mods/configurable-atm/README.md) | Set the ATM's weekly deposit limit, switch it off, and choose the six amount buttons. |
 
 ## Building
 

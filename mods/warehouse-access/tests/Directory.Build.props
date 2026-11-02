@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- Keep the repo-wide settings, then fix the output paths: the root props derive <mod> from a
+       src/<flavor>/ project, and this project sits one level higher (mods/<mod>/tests/). -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <ModName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))</ModName>
+    <BaseOutputPath>$(RepoRoot)out/$(ModName)/$(MSBuildProjectName)/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(RepoRoot)out/obj/$(ModName)/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+</Project>

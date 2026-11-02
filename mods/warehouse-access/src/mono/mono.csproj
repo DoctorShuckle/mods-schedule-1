@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Mono build: compiles the common source against the real ScheduleOne.* assemblies. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+    <AssemblyName>WarehouseAccess</AssemblyName>
+    <RootNamespace>WarehouseAccess</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <DebugType>none</DebugType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <SrcDir>$(MSBuildThisFileDirectory)..\</SrcDir>
+    <GameLibDir>$(LibDir)mono\</GameLibDir>
+    <LoaderLibDir>$(LibDir)melonloader-mono\</LoaderLibDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SrcDir)common\**\*.cs" />
+  </ItemGroup>
+
+  <!-- No Newtonsoft.Json: the mod stores nothing on disk. -->
+  <ItemGroup>
+    <Reference Include="MelonLoader" HintPath="$(LoaderLibDir)MelonLoader.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(LoaderLibDir)0Harmony.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(GameLibDir)Assembly-CSharp.dll" Private="false" />
+    <Reference Include="ScheduleOne.Core" HintPath="$(GameLibDir)ScheduleOne.Core.dll" Private="false" />
+    <Reference Include="FishNet.Runtime" HintPath="$(GameLibDir)FishNet.Runtime.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(GameLibDir)UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameLibDir)UnityEngine.CoreModule.dll" Private="false" />
+  </ItemGroup>
+
+</Project>
