@@ -8,7 +8,8 @@ once in C# and compiled twice: **IL2CPP is the primary flavor**, **Mono** is bui
 
 - All code lives in `src/common/` and compiles into both flavors. Write for IL2CPP first, then make Mono work.
 - Never commit game or MelonLoader files. `lib/`, `decompiled/`, `third-party/`, `out/`, `logs/` are gitignored.
-- A mod does nothing until configured: defaults leave the game as it is.
+- Defaults should make the mod do what its name says. Ship the change on by default when that is the point of the
+  mod (e.g. skip-disclaimer); use neutral defaults only when the mod has no sensible one (e.g. tuning multipliers).
 - Patches fail open. A broken patch must never break the game's own code path.
 - Be event-driven, not polling. Never use `OnUpdate`/`OnLateUpdate`/`OnFixedUpdate`, timers, coroutines that
   loop, or "check every N seconds" logic to notice state changes: they run every frame and are wasteful. Hook the
