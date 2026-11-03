@@ -1,7 +1,7 @@
 # Teleport App
 
 A quality-of-life ("cheat") mod for **Schedule I**. Teleport to a property or business you own, or to a
-dealer you have hired, or a store, from a **TP** app on the phone or with three keys. It is free and has no cooldown.
+dealer you have hired, a store, or a vehicle you own, from a **TP** app on the phone or with three keys. It is free and has no cooldown.
 
 ## Using it
 
@@ -12,7 +12,7 @@ dealer you have hired, or a store, from a **TP** app on the phone or with three 
 | `\` | Teleport to the picked place |
 
 **On the phone:** open the phone and press the blue **TP** icon. A list opens with the kinds of place you
-have, with counts: **Properties**, **Businesses**, **Dealers** and **Stores** (a kind with nothing in it is not shown).
+have, with counts: **Properties**, **Businesses**, **Dealers**, **Stores** and **Vehicles** (a kind with nothing in it is not shown).
 Choose one, then choose the place, and you teleport and the phone closes. Choose with the stick and A, or the
 mouse; B closes the list. The lists are the popup the game's settings dropdowns use, so they work with a controller.
 
@@ -23,13 +23,18 @@ again, so you can change several, and B ends. The first entry of each list switc
 only affects the keys: the phone lists keep showing everything. The choices are saved.
 
 A line of text near the bottom of the screen shows the pick ("Teleport to: Bungalow (2/5)") and the result.
-The keys step through all places in one list: properties, businesses, dealers, then stores, each by name. The
+The keys step through all places in one list: properties, businesses, dealers, stores, then vehicles, each by name. The
 lists follow what you own and who you have hired right now, so a new place appears without restarting.
 
 **Stores:** the ten stores (Dan's Hardware, Handy Hank's, both Gas-Marts, Pawn Shop, Shred Shack, Ray's Real
-Estate, Blueball's Boutique, Thrifty Threads, Top Tattoo) have a fixed spot in front of them. The game has no
+Estate, Blueball's Boutique, Thrifty Threads, Top Tattoo) and the Black Market (the Dark Market warehouse; you
+land outside its door, which this does not open) have a fixed spot in front of them. The game has no
 list of store exteriors, so the mod carries the spots as numbers and snaps each to the ground when you
 teleport; you keep the way you were facing. If the game's map changes they may need updating.
+
+**Vehicles:** the vehicles you own, named by colour and model (for example "Red Shitbox"). You land beside
+the vehicle, a metre and a half past its side, facing it. The list reads the game's list of all vehicles and
+keeps the ones you own, so it works for guests as well as the host.
 
 **Dealers:** only dealers you have hired are listed. A dealer moves, so you land about 1.5 m in front of
 where they are at that moment, facing them. A dealer who is indoors stands just outside the building's
@@ -51,6 +56,7 @@ Settings live in `UserData/MelonPreferences.cfg`, under `[TeleportApp]`.
 | `ShowDealers` | `true` | `false` removes the Dealers category |
 | `OnlyHiredDealers` | `true` | `true` lists only dealers you have hired; `false` lists every dealer, marking the ones not hired |
 | `ShowStores` | `true` | `false` removes the Stores category (stores have no owned state) |
+| `ShowVehicles` | `true` | `false` removes the Vehicles category (only vehicles you own are ever listed) |
 | `RotationKinds` | blank | Kinds the keys step through, such as `Property|Dealer`. Blank is every kind, `None` is none. Set on the phone |
 | `RotationExcluded` | blank | Codes of places the keys skip, separated by `\|`. Set on the phone |
 | `UseInteriorSpawn` | `false` | `false` teleports to the outside spawn point; `true` to the inside one. If a place has only one, that one is used |
@@ -89,6 +95,7 @@ game shares which properties are owned, so each player should see the same list.
 The hotkeys and the phone icon. The icon is added the first time the phone is opened in a save; if it cannot
 be added the log says so and the hotkeys still work. See [PROPOSAL.md](PROPOSAL.md) for the plan.
 
-Run in game on a Steam Deck (IL2CPP) in single player: the hotkeys (picking, teleporting, landing on the ground)
-and the phone icon with its list work, with a controller.
-The Mono build is not run in game, and multiplayer is not tested.
+Run in game on a Steam Deck (IL2CPP) in single player, with a controller: the hotkeys, the phone icon and its
+lists, and the five kinds (properties, businesses, dealers, stores, vehicles) work. The Pawn Shop landing was
+fixed after it put the player on the roof; other stores have not each been checked. The hotkey rotation editor
+was not reported on separately. The Mono build is not run in game, and multiplayer is not tested.

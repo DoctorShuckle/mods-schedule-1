@@ -9,6 +9,7 @@ namespace TeleportApp
         public GameProperty Property;   // properties and businesses
         public GameDealer Dealer;       // dealers
         public Vector3 Point;           // stores
+        public GameVehicle Vehicle;     // vehicles
         public string Code;
         public string Name;
         public bool Held = true;        // owned (property, business) or hired (dealer)
@@ -28,6 +29,9 @@ namespace TeleportApp
 
         // How far in front of a dealer the player lands, so they do not stand inside the dealer.
         private const float DealerDistance = 1.5f;
+
+        // How far past the side of a vehicle the player lands.
+        private const float VehicleGap = 1.5f;
 
         /// <summary>
         /// Everything the player can travel to, as the settings allow: properties, businesses and dealers,
@@ -69,12 +73,31 @@ namespace TeleportApp
                 foreach (Stores.Store store in Stores.All)
                     all.Add(new Place { Kind = PlaceKind.Store, Point = new Vector3(store.X, store.Y, store.Z), Code = "store:" + store.Name, Name = store.Name });
 
+            if (ModConfig.ShowVehicles && NetworkSingleton<GameVehicleManager>.InstanceExists)
+            {
+                // Read from the list of every vehicle: the owned list the game keeps is only filled on the host.
+                var vehicles = NetworkSingleton<GameVehicleManager>.Instance.AllVehicles;
+                for (int i = 0; vehicles != null && i < vehicles.Count; i++)
+                {
+                    GameVehicle v = vehicles[i];
+                    if (v == null || !v.IsPlayerOwned) continue;
+                    all.Add(new Place { Kind = PlaceKind.Vehicle, Vehicle = v, Code = v.GUID.ToString(), Name = VehicleName(v) });
+                }
+            }
+
             return Destinations.Order(all, x => x.Code, x => x.Name, x => (int)x.Kind);
         }
 
         /// <summary>The places the hotkeys step through: the listed places that are also in the rotation.</summary>
         public static List<Place> RotationPlaces()
             => Places().FindAll(p => ModConfig.InRotation(p.Kind, p.Code));
+
+        // "Red Shitbox": the colour tells apart two of the same model.
+        private static string VehicleName(GameVehicle v)
+        {
+            string color = Singleton<GameVehicleColors>.InstanceExists ? Singleton<GameVehicleColors>.Instance.GetColorName(v.OwnedColor) : "";
+            return string.IsNullOrEmpty(color) ? v.VehicleName : color + " " + v.VehicleName;
+        }
 
         private static Place MakeProperty(GameProperty property, PlaceKind kind) => new Place
         {
@@ -122,6 +145,18 @@ namespace TeleportApp
             {
                 position = GroundAt(place.Point);
                 rotation = current;   // a store has no facing of its own: keep the way the player looks
+                return true;
+            }
+
+            if (place.Kind == PlaceKind.Vehicle)
+            {
+                // The player lands beside the vehicle (a metre and a half past its side), facing it.
+                if (place.Vehicle == null || place.Vehicle.transform.position.y < -50f) return false;
+                Transform car = place.Vehicle.transform;
+                float halfWidth = place.Vehicle.boundingBox != null ? place.Vehicle.BoundingBoxDimensions.x / 2f : 1f;
+                Vector3 side = Vector3.ProjectOnPlane(car.right, Vector3.up).normalized;
+                position = GroundAt(car.position + side * (halfWidth + VehicleGap));
+                rotation = Quaternion.LookRotation(-side);
                 return true;
             }
 

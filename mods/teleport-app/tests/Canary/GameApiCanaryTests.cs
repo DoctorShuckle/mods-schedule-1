@@ -102,5 +102,25 @@ namespace TeleportApp.Tests
             Assert.Equal("String", GameApi.ValueType(dealer, "FullName", isStatic: false)?.Name);
             Assert.Equal("String", GameApi.ValueType(dealer, "ID", isStatic: false)?.Name);
         }
+
+        [SkippableTheory]
+        [MemberData(nameof(Flavors))]
+        public void The_vehicle_members_the_mod_reads_exist(string flavor)
+        {
+            using GameApi game = GameApi.Open(flavor);
+
+            System.Type manager = game.GameType("Vehicles.VehicleManager");
+            Assert.Equal("List`1", GameApi.ValueType(manager, "AllVehicles", isStatic: false)?.Name);
+
+            System.Type vehicle = game.GameType("Vehicles.LandVehicle");
+            Assert.Equal("Boolean", GameApi.ValueType(vehicle, "IsPlayerOwned", isStatic: false)?.Name);
+            Assert.Equal("String", GameApi.ValueType(vehicle, "VehicleName", isStatic: false)?.Name);
+            Assert.Equal("Guid", GameApi.ValueType(vehicle, "GUID", isStatic: false)?.Name);
+            Assert.Equal("BoxCollider", GameApi.ValueType(vehicle, "boundingBox", isStatic: false)?.Name);
+            Assert.Equal("Vector3", GameApi.ValueType(vehicle, "BoundingBoxDimensions", isStatic: false)?.Name);
+            Assert.NotNull(GameApi.ValueType(vehicle, "OwnedColor", isStatic: false));
+            Assert.Contains(game.GameType("Vehicles.Modification.VehicleColors").GetMethods(GameApi.Declared),
+                m => m.IsPublic && m.Name == "GetColorName" && m.ReturnType.Name == "String");
+        }
     }
 }

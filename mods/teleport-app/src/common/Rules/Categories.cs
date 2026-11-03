@@ -8,14 +8,15 @@ namespace TeleportApp
         Property = 0,
         Business = 1,
         Dealer = 2,
-        Store = 3
+        Store = 3,
+        Vehicle = 4
     }
 
     /// <summary>The first step of the phone's picker: which kind of place. Game-free, so unit-tested.</summary>
     internal static class Categories
     {
         /// <summary>How many kinds there are.</summary>
-        public const int Count = 4;
+        public const int Count = 5;
 
         /// <summary>The kinds that have at least one place, in list order. Empty kinds are not offered.</summary>
         public static List<PlaceKind> NonEmpty(IList<int> countByKind)
@@ -34,7 +35,8 @@ namespace TeleportApp
                 case PlaceKind.Property: return "Properties";
                 case PlaceKind.Business: return "Businesses";
                 case PlaceKind.Dealer: return "Dealers";
-                default: return "Stores";
+                case PlaceKind.Store: return "Stores";
+                default: return "Vehicles";
             }
         }
 

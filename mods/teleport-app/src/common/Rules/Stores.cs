@@ -34,6 +34,9 @@ namespace TeleportApp
             new Store("Blueball's Boutique", 71f, 1f, -8f),
             new Store("Thrifty Threads", -22.5f, 1f, 12f),
             new Store("Top Tattoo", -130f, -2.9f, 67.4f),
+            // The Dark Market warehouse, on the street side of its door. Teleporting here does not open
+            // the door: that is still the warehouse quest's (or the Warehouse Access mod's) business.
+            new Store("Black Market", -42f, -1.5f, 43f),
         };
     }
 }

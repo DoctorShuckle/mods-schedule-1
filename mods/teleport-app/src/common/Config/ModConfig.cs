@@ -16,6 +16,7 @@ namespace TeleportApp
         private static MelonPreferences_Entry<bool> _showDealers;
         private static MelonPreferences_Entry<bool> _onlyHiredDealers;
         private static MelonPreferences_Entry<bool> _showStores;
+        private static MelonPreferences_Entry<bool> _showVehicles;
         private static MelonPreferences_Entry<string> _rotationKinds;
         private static MelonPreferences_Entry<string> _rotationExcluded;
         private static MelonPreferences_Entry<bool> _enableHotkeys;
@@ -32,6 +33,7 @@ namespace TeleportApp
         public static bool ShowDealers { get; private set; } = true;
         public static bool OnlyHiredDealers { get; private set; } = true;
         public static bool ShowStores { get; private set; } = true;
+        public static bool ShowVehicles { get; private set; } = true;
         public static HashSet<PlaceKind> RotationKinds { get; private set; } = Rotation.AllKinds();
         public static HashSet<string> RotationExcluded { get; private set; } = new HashSet<string>();
         public static bool EnableHotkeys { get; private set; } = true;
@@ -63,6 +65,8 @@ namespace TeleportApp
                 "Which kinds the hotkeys step through, such as Property|Dealer. Blank means every kind, None means no kind. Easiest to change on the phone: TP, then Hotkey rotation.");
             _rotationExcluded = category.CreateEntry("RotationExcluded", "", "Places left out of the hotkey rotation",
                 "Codes of places the hotkeys skip, separated by |. Easiest to change on the phone: TP, then Hotkey rotation.");
+            _showVehicles = category.CreateEntry("ShowVehicles", true, "List vehicles",
+                "false takes the Vehicles category (the vehicles you own) out of the phone list and the hotkeys.");
             _enableHotkeys = category.CreateEntry("EnableHotkeys", true, "Enable the hotkeys",
                 "Turns the three keys below on or off.");
             _previousKey = category.CreateEntry("PreviousKey", "LeftBracket", "Previous place key",
@@ -88,6 +92,7 @@ namespace TeleportApp
             ShowDealers = _showDealers.Value;
             OnlyHiredDealers = _onlyHiredDealers.Value;
             ShowStores = _showStores.Value;
+            ShowVehicles = _showVehicles.Value;
             RotationKinds = Rotation.ParseKinds(_rotationKinds.Value);
             RotationExcluded = Rotation.ParseCodes(_rotationExcluded.Value);
             EnableHotkeys = _enableHotkeys.Value;

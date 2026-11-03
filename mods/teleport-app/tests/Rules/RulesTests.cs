@@ -61,8 +61,8 @@ namespace TeleportApp.Tests
         {
             Assert.Equal(new[] { PlaceKind.Property, PlaceKind.Dealer }, Categories.NonEmpty(new[] { 2, 0, 1 }));
             Assert.Equal(new[] { PlaceKind.Business }, Categories.NonEmpty(new[] { 0, 4, 0 }));
-            Assert.Empty(Categories.NonEmpty(new[] { 0, 0, 0, 0 }));
-            Assert.Equal(new[] { PlaceKind.Store }, Categories.NonEmpty(new[] { 0, 0, 0, 3 }));
+            Assert.Empty(Categories.NonEmpty(new[] { 0, 0, 0, 0, 0 }));
+            Assert.Equal(new[] { PlaceKind.Store }, Categories.NonEmpty(new[] { 0, 0, 0, 3, 0 }));
         }
 
         [Fact]
@@ -74,6 +74,7 @@ namespace TeleportApp.Tests
         [InlineData(PlaceKind.Business, 1, "Businesses (1)")]
         [InlineData(PlaceKind.Dealer, 6, "Dealers (6)")]
         [InlineData(PlaceKind.Store, 10, "Stores (10)")]
+        [InlineData(PlaceKind.Vehicle, 2, "Vehicles (2)")]
         public void Labels_a_category_with_its_count(PlaceKind kind, int count, string expected)
             => Assert.Equal(expected, Categories.Label(kind, count));
     }
@@ -109,8 +110,8 @@ namespace TeleportApp.Tests
         [Fact]
         public void Blank_kinds_mean_every_kind_and_none_means_no_kind()
         {
-            Assert.Equal(4, Rotation.ParseKinds("").Count);
-            Assert.Equal(4, Rotation.ParseKinds(null).Count);
+            Assert.Equal(Categories.Count, Rotation.ParseKinds("").Count);
+            Assert.Equal(Categories.Count, Rotation.ParseKinds(null).Count);
             Assert.Empty(Rotation.ParseKinds("None"));
         }
 

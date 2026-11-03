@@ -26,6 +26,9 @@ player). The sections below are the original plan; "As built" says where the res
   businesses and dealers can be limited to owned/hired or show everything.
 - **Hotkey rotation:** the keys can be limited to some kinds and some places. It is edited on the phone
   ("Hotkey rotation..." in the first list; each entry flips and the list reopens) and saved as two settings.
+- **Vehicles:** the vehicles the player owns, from `VehicleManager.AllVehicles` filtered by `IsPlayerOwned`
+  (the game's `PlayerOwnedVehicles` list is only filled on the host). Landing is 1.5 m past the vehicle's
+  side, facing it.
 - **Still open:** multiplayer is untested, and the Mono build has not been run in game.
 
 ## Summary

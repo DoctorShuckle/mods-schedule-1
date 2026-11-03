@@ -8,6 +8,9 @@ global using Il2CppScheduleOne.DevUtilities;
 global using GameProperty = Il2CppScheduleOne.Property.Property;
 global using GameBusiness = Il2CppScheduleOne.Property.Business;
 global using GameDealer = Il2CppScheduleOne.Economy.Dealer;
+global using GameVehicle = Il2CppScheduleOne.Vehicles.LandVehicle;
+global using GameVehicleColors = Il2CppScheduleOne.Vehicles.Modification.VehicleColors;
+global using GameVehicleManager = Il2CppScheduleOne.Vehicles.VehicleManager;
 global using GameHomeScreen = Il2CppScheduleOne.UI.Phone.HomeScreen;
 global using GamePhone = Il2CppScheduleOne.UI.Phone.Phone;
 #else
@@ -18,6 +21,9 @@ global using ScheduleOne.DevUtilities;
 global using GameProperty = ScheduleOne.Property.Property;
 global using GameBusiness = ScheduleOne.Property.Business;
 global using GameDealer = ScheduleOne.Economy.Dealer;
+global using GameVehicle = ScheduleOne.Vehicles.LandVehicle;
+global using GameVehicleColors = ScheduleOne.Vehicles.Modification.VehicleColors;
+global using GameVehicleManager = ScheduleOne.Vehicles.VehicleManager;
 global using GameHomeScreen = ScheduleOne.UI.Phone.HomeScreen;
 global using GamePhone = ScheduleOne.UI.Phone.Phone;
 #endif
