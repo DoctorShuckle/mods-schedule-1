@@ -5,7 +5,7 @@ namespace ConfigurableAtm
 {
     /// <summary>
     /// Runs as the ATM screen starts, on both builds: the game labels the amount buttons from its
-    /// amounts there, and shows the limit readout there.
+    /// amounts there.
     /// </summary>
     [HarmonyPatch(typeof(ATMInterface), "Start")]
     internal static class ATMInterface_Start_Patch
@@ -24,17 +24,29 @@ namespace ConfigurableAtm
                 ModLog.Warning("Could not set the ATM's amount buttons: " + ex);
             }
         }
+    }
 
-        // After the game's Start, which shows the readout unconditionally.
+    /// <summary>
+    /// Shows or hides the "spent / limit" readout while an ATM is open, on both builds. With the limit
+    /// off the game would draw the largest float there. It is done every update rather than as the
+    /// screen starts so that switching the setting while the game runs takes effect on the open ATM.
+    /// </summary>
+    [HarmonyPatch(typeof(ATMInterface), "Update")]
+    internal static class ATMInterface_Update_Readout_Patch
+    {
+        private static bool _warned;
+
         private static void Postfix(ATMInterface __instance)
         {
             try
             {
-                if (!ModConfig.LimitEnabled) GameAccess.SetLimitDisplayVisible(__instance, false);
+                if (__instance.IsOpen) GameAccess.SetLimitDisplayVisible(__instance, ModConfig.LimitEnabled);
             }
             catch (Exception ex)
             {
-                ModLog.Warning("Could not hide the deposit limit readout: " + ex);
+                if (_warned) return; // every frame: say it once
+                _warned = true;
+                ModLog.Warning("Could not show or hide the deposit limit readout: " + ex);
             }
         }
     }
