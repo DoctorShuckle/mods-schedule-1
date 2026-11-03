@@ -10,6 +10,7 @@
     <Nullable>disable</Nullable>
     <DebugType>none</DebugType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
     <SrcDir>$(MSBuildThisFileDirectory)..\</SrcDir>
     <GameLibDir>$(LibDir)il2cpp\</GameLibDir>
@@ -32,6 +33,8 @@
     <Reference Include="UnityEngine" HintPath="$(GameLibDir)UnityEngine.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(GameLibDir)UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameLibDir)UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(GameLibDir)UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(GameLibDir)UnityEngine.UIModule.dll" Private="false" />
     <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameLibDir)UnityEngine.TextRenderingModule.dll" Private="false" />
     <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameLibDir)UnityEngine.InputLegacyModule.dll" Private="false" />
   </ItemGroup>

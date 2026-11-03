@@ -1,6 +1,20 @@
 # Teleport to Properties: proposal
 
-Status: **sketch**. Nothing is implemented. This file only records the plan and its open risks.
+Status: **built**. The hotkeys and the phone icon are implemented and run on a Steam Deck (IL2CPP, single
+player). The sections below are the original plan; "As built" says where the result differs.
+
+## As built
+
+- **Phone app:** not a hand-built app panel. A blue **TP** icon is cloned from a vanilla home-screen icon and
+  joins the home screen's controller navigation. Pressing it opens the game's own list popup
+  (`UIScreenManager.OpenPopupScreen("ContextMenu", ...)`, the one its settings dropdowns use), which already
+  handles stick, A, B and mouse. This replaced the planned scroll list and the explicit `Selectable` navigation.
+- **Icon:** the text "TP", no sprite.
+- **Created on demand:** a postfix on `Phone.SetIsOpen(true)` adds the icon; no scene search or polling.
+- **Hotkeys:** keyboard defaults only (`[`, `]`, `\`); the Deck button is mapped in Steam Input. They are
+  ignored while the phone is open.
+- **Landing:** feet aligned to the spawn point plus 0.3 m, because spawn points sit at ground level.
+- **Still open:** multiplayer is untested, and the Mono build has not been run in game.
 
 ## Summary
 
@@ -135,5 +149,5 @@ navigation proves unreliable, and costs little because it shares the same `Desti
 None. Resolved:
 
 - Spawn: **exterior** (`SpawnPoint`) by default; interior stays an optional setting.
-- Hotkeys: **keyboard-only** defaults. The Steam Deck button is bound by the user outside the mod (Steam Input) for now.
+
 - App icon: no sprite; the app shows the text **"TP"**.

@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
 using MelonLoader;
 using TeleportToProperties;
 
@@ -9,11 +12,14 @@ using TeleportToProperties;
 #else
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.MONO)]
 #endif
+// Patch classes are applied one by one below, so a single missing game method cannot abort the rest.
+[assembly: HarmonyDontPatchAll]
 
 // ---------------------------------------------------------------------------------------------
 // How the mod works
 //
-// Three keys: previous place, next place, teleport. The places are the properties and businesses the
+// A "TP" icon on the phone opens the game's own list popup of the player's places. Three keys do
+// the same without the phone: previous place, next place, teleport. The places are the properties and businesses the
 // player owns, read from the game's own lists each time a key is pressed, so a place bought later
 // shows up without a restart. Teleporting calls the game's own PlayerMovement.Teleport on the local
 // player only. Nothing is patched, saved or sent over the network.
@@ -27,14 +33,27 @@ namespace TeleportToProperties
     /// </summary>
     public sealed class TeleportToPropertiesMod : MelonMod
     {
-        // Remembered by code, so the pick survives the list changing (see Selection).
-        private string _pickedCode;
-
         public override void OnInitializeMelon()
         {
             ModLog.Init(LoggerInstance);
             ModConfig.Init();
             ModConfig.Apply();
+
+            List<Type> patches = FindPatches();
+            int applied = 0;
+            foreach (Type patch in patches)
+            {
+                try
+                {
+                    HarmonyInstance.CreateClassProcessor(patch).Patch();
+                    applied++;
+                }
+                catch (Exception ex)
+                {
+                    // Loud on purpose: a failed patch means the TP icon is off. The keys still work.
+                    LoggerInstance.Error("Patch " + patch.Name + " failed: " + ex.Message);
+                }
+            }
 
             LoggerInstance.Msg("Teleport to Properties 1.0.0 (" +
 #if IL2CPP
@@ -42,7 +61,7 @@ namespace TeleportToProperties
 #else
                 "Mono" +
 #endif
-                "): " + ModConfig.PreviousKey + " / " + ModConfig.NextKey + " pick a place, " + ModConfig.TeleportKey + " teleports.");
+                "): " + applied + "/" + patches.Count + " patches applied. Keys: " + ModConfig.PreviousKey + " / " + ModConfig.NextKey + " pick a place, " + ModConfig.TeleportKey + " teleports.");
         }
 
         // Per-frame work, because nothing can be hooked: a key press raises no game event. The check is
@@ -64,6 +83,21 @@ namespace TeleportToProperties
 
         public override void OnPreferencesSaved() => ModConfig.Apply();
 
+        /// <summary>Every type in this assembly marked [HarmonyPatch], in name order so the log reads the same each launch.</summary>
+        private static List<Type> FindPatches()
+        {
+            Type[] types;
+            try { types = typeof(TeleportToPropertiesMod).Assembly.GetTypes(); }
+            // A type that cannot load (a game class that has gone) must not hide the rest.
+            catch (ReflectionTypeLoadException ex) { types = ex.Types; }
+
+            var patches = new List<Type>();
+            foreach (Type type in types)
+                if (type != null && type.IsDefined(typeof(HarmonyPatch), false)) patches.Add(type);
+            patches.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
+            return patches;
+        }
+
         private void Pick(int delta)
         {
             List<Place> places = GameAccess.OwnedPlaces();
@@ -73,35 +107,23 @@ namespace TeleportToProperties
                 return;
             }
 
-            int index = Selection.Step(Selection.Resolve(Codes(places), _pickedCode), places.Count, delta);
-            _pickedCode = places[index].Code;
+            int index = Selection.Step(Selection.Resolve(Codes(places), Travel.PickedCode), places.Count, delta);
+            Travel.PickedCode = places[index].Code;
             Toast.Show("Teleport to: " + places[index].Name + "  (" + (index + 1) + "/" + places.Count + ")");
-            ModLog.Verbose("Picked " + places[index].Name + " [" + _pickedCode + "].");
+            ModLog.Verbose("Picked " + places[index].Name + " [" + places[index].Code + "].");
         }
 
         private void Go()
         {
             List<Place> places = GameAccess.OwnedPlaces();
-            int index = Selection.Resolve(Codes(places), _pickedCode);
+            int index = Selection.Resolve(Codes(places), Travel.PickedCode);
             if (index < 0)
             {
                 Toast.Show("You own no properties yet");
                 return;
             }
 
-            Place place = places[index];
-            string refusal = GameAccess.TeleportTo(place, ModConfig.UseInterior, out Vector3 _);
-            if (refusal.Length == 0)
-            {
-                _pickedCode = place.Code;
-                Toast.Show("Teleported to " + place.Name);
-                ModLog.Verbose("Teleported to " + place.Name + ".");
-            }
-            else
-            {
-                Toast.Show(refusal);
-                ModLog.Verbose("Refused: " + refusal + ".");
-            }
+            Travel.Go(places[index]);
         }
 
         private static List<string> Codes(List<Place> places)

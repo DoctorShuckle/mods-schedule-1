@@ -7,6 +7,8 @@ global using Il2CppScheduleOne;
 global using Il2CppScheduleOne.DevUtilities;
 global using GameProperty = Il2CppScheduleOne.Property.Property;
 global using GameBusiness = Il2CppScheduleOne.Property.Business;
+global using GameHomeScreen = Il2CppScheduleOne.UI.Phone.HomeScreen;
+global using GamePhone = Il2CppScheduleOne.UI.Phone.Phone;
 #else
 global using ScheduleOne.PlayerScripts;
 global using ScheduleOne.UI;
@@ -14,5 +16,9 @@ global using ScheduleOne;
 global using ScheduleOne.DevUtilities;
 global using GameProperty = ScheduleOne.Property.Property;
 global using GameBusiness = ScheduleOne.Property.Business;
+global using GameHomeScreen = ScheduleOne.UI.Phone.HomeScreen;
+global using GamePhone = ScheduleOne.UI.Phone.Phone;
 #endif
 global using UnityEngine;
+global using UnityEngine.Events;
+global using UnityEngine.UI;

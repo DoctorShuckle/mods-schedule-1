@@ -63,10 +63,12 @@ namespace TeleportToProperties
             return first != null ? first : second;
         }
 
-        /// <summary>True while a key press should go to the game, not to the mod (typing, paused, no player).</summary>
+        /// <summary>True while a key press should go to the game, not to the mod (typing, paused, the phone open).</summary>
         public static bool InputBlocked()
         {
             if (GameInput.IsTyping) return true;
+            // The phone has its own way to pick a place; the keys would teleport behind its list.
+            if (Singleton<GameplayMenu>.InstanceExists && Singleton<GameplayMenu>.Instance.IsOpen) return true;
             return Singleton<PauseMenu>.InstanceExists && Singleton<PauseMenu>.Instance.IsPaused;
         }
 

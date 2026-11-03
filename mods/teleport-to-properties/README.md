@@ -11,6 +11,10 @@ with two keys and teleport there with a third. It is free and has no cooldown.
 | `]` | Pick the next place |
 | `\` | Teleport to the picked place |
 
+**On the phone:** open the phone and press the blue **TP** icon. The game's own list popup opens with your
+places (businesses are marked); choose one with the stick and A, or the mouse, and you teleport and the phone
+closes. B closes the list. The popup is the one the game's settings dropdowns use, so it works with a controller.
+
 A line of text near the bottom of the screen shows the pick ("Teleport to: Bungalow (2/5)") and the result.
 The list is your owned properties first, then your owned businesses, each by name, and it follows what
 you own right now: a place bought later appears without restarting.
@@ -36,7 +40,7 @@ game runs are picked up.
 
 ## Things to know
 
-- The keys do nothing while you type, while the game is paused, or while you are in a vehicle.
+- The keys do nothing while you type, while the game is paused, while the phone is open, or while you are in a vehicle.
 - The mod patches nothing and saves nothing. It calls the game's own teleport on your own player.
 - It only teleports you, never other players.
 - **Per-frame work:** the mod tests three keys each frame and draws its on-screen line through IMGUI. A key
@@ -57,7 +61,9 @@ game shares which properties are owned, so each player should see the same list.
 
 ## Status
 
-Hotkey version only. A phone app (a "TP" icon with a list) is planned; see [PROPOSAL.md](PROPOSAL.md).
+The hotkeys and the phone icon. The icon is added the first time the phone is opened in a save; if it cannot
+be added the log says so and the hotkeys still work. See [PROPOSAL.md](PROPOSAL.md) for the plan.
 
-Run in game on a Steam Deck (IL2CPP) in single player: picking, teleporting and landing on the ground work.
+Run in game on a Steam Deck (IL2CPP) in single player: the hotkeys (picking, teleporting, landing on the ground)
+and the phone icon with its list work, with a controller.
 The Mono build is not run in game, and multiplayer is not tested.

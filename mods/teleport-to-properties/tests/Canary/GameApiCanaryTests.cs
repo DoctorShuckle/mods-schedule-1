@@ -58,6 +58,34 @@ namespace TeleportToProperties.Tests
 
             Assert.Equal("Boolean", GameApi.ValueType(game.GameType("GameInput"), "IsTyping", isStatic: true)?.Name);
             Assert.Equal("Boolean", GameApi.ValueType(game.GameType("UI.PauseMenu"), "IsPaused", isStatic: false)?.Name);
+            Assert.Equal("Boolean", GameApi.ValueType(game.GameType("UI.GameplayMenu"), "IsOpen", isStatic: false)?.Name);
+        }
+
+        [SkippableTheory]
+        [MemberData(nameof(Flavors))]
+        public void The_phone_and_popup_members_the_app_uses_exist(string flavor)
+        {
+            using GameApi game = GameApi.Open(flavor);
+
+            // The patch target: picked by name alone, so it must be declared once with one bool.
+            System.Type phone = game.GameType("UI.Phone.Phone");
+            MethodInfo setIsOpen = Assert.Single(phone.GetMethods(GameApi.Declared), m => m.Name == "SetIsOpen");
+            Assert.Equal("Boolean", Assert.Single(setIsOpen.GetParameters()).ParameterType.Name);
+
+            Assert.NotNull(game.GameType("UI.Phone.HomeScreen"));
+            Assert.Contains(game.GameType("UIPanel").GetMethods(GameApi.Declared),
+                m => m.IsPublic && m.Name == "AddSelectable" && m.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(new[] { "UISelectable" }));
+            Assert.Contains(game.GameType("UI.GameplayMenu").GetMethods(GameApi.Declared),
+                m => m.IsPublic && m.Name == "Close" && m.GetParameters().Length == 0);
+
+            // The list popup: opened by name with boxed arguments, so the shapes matter.
+            Assert.Contains(game.GameType("UIScreenManager").GetMethods(GameApi.Declared),
+                m => m.IsPublic && m.Name == "OpenPopupScreen" && m.GetParameters().Length == 2);
+            System.Type menu = game.GameType("UIPopupScreen_ContextMenu");
+            System.Type option = menu.GetNestedType("ContextMenuOption");
+            Assert.NotNull(option);
+            Assert.Contains(option.GetConstructors(), c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(new[] { "Int32", "String", "Action" }));
+            Assert.NotNull(menu.GetNestedType("AnchorType")?.GetField("Center"));
         }
     }
 }
