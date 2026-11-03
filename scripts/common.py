@@ -87,12 +87,57 @@ def load_local_config():
     if not LOCAL_CONFIG.is_file():
         raise SystemExit(f"Missing {LOCAL_CONFIG}; copy etc/local.example.json and edit it.")
     with LOCAL_CONFIG.open(encoding="utf-8") as f:
-        cfg = json.load(f)
-    # Fail early with a clear message rather than a KeyError mid-deploy.
-    for key in ("win_host", "win_game_dir"):
-        if key not in cfg:
-            raise SystemExit(f"{LOCAL_CONFIG} is missing '{key}'")
-    return cfg
+        return json.load(f)
+
+
+def setting(cfg, action, key, cli=None):
+    """Resolve one option: CLI flag, then cfg[action][key], then cfg["default"][key], else None."""
+    if cli is not None:
+        return cli
+    for section in (action, "default"):
+        value = cfg.get(section, {}).get(key)
+        if value is not None:
+            return value
+    return None
+
+
+def default_flavor():
+    """Preferred flavor from etc/local.json ("default"), falling back to il2cpp when there is no config."""
+    if LOCAL_CONFIG.is_file():
+        return load_local_config().get("default", {}).get("flavor") or "il2cpp"
+    return "il2cpp"
+
+
+def get_target(cfg, name):
+    """cfg["targets"][name] with host and game_dir checked, plus an absolute 'log_file' path."""
+    targets = cfg.get("targets", {})
+    if name is None:
+        raise SystemExit(f"No target given and none configured; pick one of: {', '.join(sorted(targets))}")
+    if name not in targets:
+        raise SystemExit(f"Unknown target '{name}'; configured targets: {', '.join(sorted(targets))}")
+    target = dict(targets[name], name=name)
+    for key in ("host", "game_dir"):
+        if key not in target:
+            raise SystemExit(f"{LOCAL_CONFIG}: target '{name}' is missing '{key}'")
+    # log_path is relative to the game folder unless it starts with '/' (Windows paths look like /C:/...).
+    log_path = target.get("log_path", "MelonLoader/Latest.log")
+    target["log_file"] = log_path if log_path.startswith("/") else f"{target['game_dir']}/{log_path}"
+    return target
+
+
+def remote(target, path):
+    """scp spec for a path below the target's game folder, or an absolute remote path."""
+    if not path.startswith("/"):
+        path = f"{target['game_dir']}/{path}"
+    return f"{target['host']}:{path}"
+
+
+def check_flavor(target, flavor):
+    """Refuse to deploy a flavor to a machine that runs the other one."""
+    expected = target.get("flavor")
+    if expected and expected != flavor:
+        raise SystemExit(f"Target '{target['name']}' runs {expected}, not {flavor}; "
+                         f"pass -t for another target or edit etc/local.json")
 
 
 def run(cmd, *, env=None, filter_stderr=None):

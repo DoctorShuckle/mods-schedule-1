@@ -24,17 +24,19 @@ def git_version():
 
 def main():
     p = common.make_parser(__doc__)
-    common.add_mod_flavor(p, required=True)
+    p.add_argument("-m", "--mod", required=True, choices=sorted(common.discover()), help="folder name under mods/")
+    p.add_argument("-f", "--flavor", choices=["mono", "il2cpp"], help="default: from etc/local.json, else il2cpp")
     p.add_argument("-V", "--version", help="defaults to `git describe --always --dirty`")
     args = p.parse_args()
     common.setup_logging("bundle", args.verbose)
 
+    flavor = args.flavor or common.default_flavor()
     version = args.version or git_version()
-    out, dll = common.build(args.mod, args.flavor)
+    out, dll = common.build(args.mod, flavor)
 
     bundles = ROOT / "out" / "bundles"
     bundles.mkdir(parents=True, exist_ok=True)
-    zip_path = bundles / f"{args.mod}-{args.flavor}-{version}.zip"
+    zip_path = bundles / f"{args.mod}-{flavor}-{version}.zip"
     zip_path.unlink(missing_ok=True)
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         # Path inside the zip mirrors the game folder, so Vortex can deploy it as-is.

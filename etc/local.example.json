@@ -1,5 +1,18 @@
 {
-  "_comment": "Copy to etc/local.json and edit. Only needed for deploy.py / log.py (copying to a remote game PC over scp).",
-  "win_host": "user@windows-pc",
-  "win_game_dir": "/C:/Program Files (x86)/Steam/steamapps/common/Schedule I"
+  "targets": {
+    "steamdeck": {
+      "host": "steamdeck",
+      "game_dir": "/home/deck/.local/share/Steam/steamapps/common/Schedule I",
+      "flavor": "il2cpp"
+    },
+    "windows": {
+      "host": "user@windows-pc",
+      "game_dir": "/C:/Program Files (x86)/Steam/steamapps/common/Schedule I",
+      "flavor": "il2cpp"
+    }
+  },
+  "default": { "flavor": "il2cpp" },
+  "deploy":  { "target": "steamdeck" },
+  "log":     { "target": "steamdeck", "tail": 200 },
+  "pull":    { "target": "windows", "decompile": false }
 }

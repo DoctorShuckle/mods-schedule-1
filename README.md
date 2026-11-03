@@ -19,6 +19,7 @@ both the **Mono** and **IL2CPP** branches of the game.
 | [Configurable Skateboard](mods/configurable-skateboard/README.md) | Tune the skateboard's top speed, push force, jump force and push stamina cost with multipliers. |
 | [Warehouse Access](mods/warehouse-access/README.md) | Opens the Dark Market warehouse without the knock, at every hour, once its quest is done. Optionally by rank instead. |
 | [Configurable ATM](mods/configurable-atm/README.md) | Set the ATM's weekly deposit limit, switch it off, and choose the six amount buttons. |
+| [Teleport to Properties](mods/teleport-to-properties/README.md) | Pick an owned property or business with two keys and teleport to it with a third. No cost, no cooldown. |
 
 ## Building
 
@@ -67,9 +68,10 @@ pair (`mono` or `il2cpp`). A `Makefile` wraps them; run `make help` for the list
 | ------------- | ---------------------------------------- | --------------------------------------------------------------------- |
 | `build.py`    | `make build [MOD=… FLAVOR=…]`            | Builds mods; with no `-m`/`-f` it builds everything.                  |
 | `test.py`     | `make test [MOD=…]`                      | Runs each mod's unit tests (`mods/<mod>/tests/`).                     |
-| `bundle.py`   | `make bundle MOD=… FLAVOR=… [VERSION=…]` | Builds and zips to `out/bundles/<mod>-<flavor>-<version>.zip`.        |
-| `deploy.py`   | `make deploy MOD=… FLAVOR=…`             | Builds and `scp`s the DLL to the game PC (see below).                 |
-| `log.py`      | `make log`                               | Fetches MelonLoader's `Latest.log` from the game PC and prints it.    |
+| `bundle.py`   | `make bundle MOD=… [FLAVOR=…] [VERSION=…]` | Builds and zips to `out/bundles/<mod>-<flavor>-<version>.zip`.        |
+| `deploy.py`   | `make deploy MOD=… [FLAVOR=…] [TARGET=…]` | Builds and `scp`s the DLL to a target machine (see below).           |
+| `log.py`      | `make log [TARGET=…]`                    | Fetches MelonLoader's `Latest.log` from a target and prints it.       |
+| `pull.py`     | `make pull [FLAVOR=…] [TARGET=…]`        | Copies game and MelonLoader assemblies into `lib/` from the source machine. |
 
 `make clean` removes `out/`; `make clean-logs` removes `logs/`.
 
@@ -97,9 +99,20 @@ Vortex or unzipped into the game directory.
 
 ### Deploying to another machine
 
-`deploy.py` and `log.py` copy files over `scp` to a game install on another machine. Copy
-`etc/local.example.json` to `etc/local.json` (gitignored) and fill in `win_host` and `win_game_dir`. Not
-needed if you build and play on the same machine.
+`deploy.py`, `log.py` and `pull.py` talk to game installs on other machines over `scp`. Copy
+`etc/local.example.json` to `etc/local.json` (gitignored) and edit it:
+
+- `targets`: one entry per machine with an SSH `host` (an alias from `~/.ssh/config` works), the `game_dir`,
+  its `flavor`, and optionally `log_path` (relative to `game_dir`, default `MelonLoader/Latest.log`). Windows
+  paths are written `/C:/...`.
+- `default.flavor`: preferred flavor when `-f` is omitted.
+- `deploy`, `log`, `pull`: per-script defaults (`target`, plus `tail` for `log` and `decompile` for `pull`).
+  A command-line flag always wins, e.g. `scripts/deploy.py -m configurable-atm -t windows`.
+
+With the example, `make deploy MOD=x` builds IL2CPP and copies it to the Steam Deck, `make log` prints the
+Deck's log, and `make pull` refreshes `lib/il2cpp` and `lib/melonloader-il2cpp` from the Windows PC
+(`--decompile` also runs `ilspycmd`). A deploy or pull for a flavor the target does not run is refused.
+Not needed if you build and play on the same machine.
 
 ### Logs
 
