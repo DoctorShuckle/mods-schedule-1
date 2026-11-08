@@ -164,8 +164,9 @@ numbers on screen match.
 
 - **More routes than the game's five** adds extra rows to the packager's management screen and makes
   the list scrollable (mouse wheel). The mouse wheel is blocked from changing the held item while
-  that screen is open. More than the screen's existing rows for *stations* is not covered: the limit
-  is raised, but the screen only has so many rows.
+  that screen is open. With a controller, the extra rows are added to the game's own gamepad
+  navigation, and the list scrolls to keep the selected row in view. More than the screen's existing
+  rows for *stations* is not covered: the limit is raised, but the screen only has so many rows.
 - **Job times work by changing the worker's speed**, not the game's timers. For the length of a job
   the mod multiplies the worker's work speed by the game's base time divided by yours. The work
   animation follows the speed, so a faster job also looks faster. For the botanist's jobs the change
@@ -215,7 +216,7 @@ numbers on screen match.
   | `Worker_TaskDuration` | the chemist and packager job times only |
   | `Fixer` | the Fixer's fee setting |
   | `Property_Awake` | setting a property's capacity as it starts. Capacities are still set once the scene has loaded |
-  | `RouteListFieldUI` | extra route rows and the scroll area |
+  | `RouteListFieldUI` | extra route rows, the scroll area, and the scrolling to a controller's selection |
   | `ManagementInterface` | the tracking of the management screen being open (so the mouse wheel is not blocked) |
   | `MouseScrollDelta` | blocking the mouse wheel while the management screen is open |
   | `InitializeNPC` | walk speed |
@@ -275,7 +276,9 @@ Not yet confirmed in the game:
   effect of each worker's `MoveItemSeconds` (its jobs include walking, so the log cannot isolate it).
 - Employees standing at the idle points the mod adds, lowering a capacity, and capacities for
   properties other than the bungalow.
-- The extra route rows and scroll area.
+- The extra route rows and scroll area, with a mouse and with a controller. The controller support
+  rests on an assumption (that the game's own route rows are listed in the screen's gamepad panel),
+  and the log says at startup if that did not hold.
 - The Mono build, which compiles and passes the tests but has not been run in the game.
 
 ## For developers

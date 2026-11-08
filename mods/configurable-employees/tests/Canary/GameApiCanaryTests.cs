@@ -149,6 +149,27 @@ namespace ConfigurableEmployees.Tests
 
         [SkippableTheory]
         [MemberData(nameof(Flavors))]
+        public void Controller_navigation_members_the_routes_list_uses_exist(string flavor)
+        {
+            using GameApi game = GameApi.Open(flavor);
+            Type selectable = game.GameType("UISelectable");
+            Type panel = game.GameType("UIPanel");
+
+            // The scroll-to-selection patch: the method the event system calls when something is selected.
+            MethodInfo onSelect = OnlyMethod(selectable, "OnSelect");
+            Assert.Equal("BaseEventData", Assert.Single(onSelect.GetParameters()).ParameterType.Name);
+            Assert.Equal("Void", onSelect.ReturnType.Name);
+
+            // Extra rows are added to the panel that already owns the original rows' buttons.
+            Assert.Equal("UIPanel", FieldType(selectable, "ParentPanel"));
+            Assert.Equal("RectTransform", FieldType(selectable, "RectTransform"));
+            MethodInfo add = OnlyMethod(panel, "AddSelectable");
+            Assert.Equal("Boolean", add.ReturnType.Name);
+            Assert.Equal("UISelectable", Assert.Single(add.GetParameters()).ParameterType.Name);
+        }
+
+        [SkippableTheory]
+        [MemberData(nameof(Flavors))]
         public void Misting_still_shares_the_watering_duration(string flavor)
         {
             using GameApi game = GameApi.Open(flavor);

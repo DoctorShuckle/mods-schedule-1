@@ -18,6 +18,23 @@ namespace ConfigurableEmployees
     }
 
     /// <summary>
+    /// Keeps the routes list scrolled to whatever a controller has selected. The game's panels scroll
+    /// only a scroll area of their own, so the list made by RouteListUi has to follow the selection
+    /// itself. Every selection in the game comes through here; RouteListUi ignores all but its rows.
+    /// The name starts with RouteListFieldUI so that skipping that one patch name turns off the whole
+    /// feature.
+    /// </summary>
+    [HarmonyPatch(typeof(UISelectable), "OnSelect")]
+    internal static class RouteListFieldUI_ScrollToSelection_Patch
+    {
+        private static void Postfix(UISelectable __instance)
+        {
+            try { RouteListUi.ScrollIntoView(__instance); }
+            catch (Exception ex) { ModLog.Warning("Could not scroll the routes list to the selection: " + ex.Message); }
+        }
+    }
+
+    /// <summary>
     /// While the management screen is open the mouse wheel must scroll the routes list and
     /// nothing else (it would otherwise also change the held item and close the screen).
     /// </summary>
