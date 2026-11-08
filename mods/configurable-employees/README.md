@@ -220,6 +220,7 @@ numbers on screen match.
   | `ManagementInterface` | the tracking of the management screen being open (so the mouse wheel is not blocked) |
   | `MouseScrollDelta` | blocking the mouse wheel while the management screen is open |
   | `InitializeNPC` | walk speed |
+  | `AssignProperty` | the stations, bins and routes limits, written when an employee is given a property (the moment the game builds their configuration) |
   | `Employee_Start` | wage, fee and limits for employees loaded from a save |
   | `EmployeeManager_Awake` | wage, fee and limits for new hires |
 

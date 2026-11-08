@@ -90,6 +90,17 @@ namespace ConfigurableEmployees
             }
         }
 
+        /// <summary>
+        /// The employee has just been given its property, which is when the game builds its
+        /// configuration. Employee.Start can run before that, and the limits cannot be written to a
+        /// configuration that does not exist yet, so they are written here as well.
+        /// </summary>
+        public static void ApplyConfigurationLimits(Employee employee)
+        {
+            EmployeeKind kind = GameAccess.KindOf(employee);
+            if (kind != EmployeeKind.Unknown) ApplyLimits(employee, kind);
+        }
+
         // The game's configuration objects set their own limits when they are built, from fixed
         // numbers (chemist, cleaner, routes) or from the prefab fields above (packager, botanist
         // stations). Writing the limit onto the built configuration covers all of them.

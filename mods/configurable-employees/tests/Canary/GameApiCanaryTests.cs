@@ -149,6 +149,24 @@ namespace ConfigurableEmployees.Tests
 
         [SkippableTheory]
         [MemberData(nameof(Flavors))]
+        public void Each_employee_class_builds_its_configuration_in_its_own_AssignProperty(string flavor)
+        {
+            using GameApi game = GameApi.Open(flavor);
+
+            // The limits are written right after this method, once the configuration exists, so each
+            // class must still declare its own (Harmony patches the one on that class, not the base's).
+            foreach (string name in new[] { "Botanist", "Chemist", "Packager", "Cleaner" })
+            {
+                MethodInfo assign = OnlyMethod(game.GameType("Employees." + name), "AssignProperty");
+                Assert.Equal("Void", assign.ReturnType.Name);
+                ParameterInfo[] parameters = assign.GetParameters();
+                Assert.Equal(2, parameters.Length);
+                Assert.Equal("Boolean", parameters[1].ParameterType.Name);
+            }
+        }
+
+        [SkippableTheory]
+        [MemberData(nameof(Flavors))]
         public void Controller_navigation_members_the_routes_list_uses_exist(string flavor)
         {
             using GameApi game = GameApi.Open(flavor);
