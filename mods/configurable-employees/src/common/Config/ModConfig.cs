@@ -78,7 +78,7 @@ namespace ConfigurableEmployees
 
             MelonPreferences_Category packager = Category("Packager", "Packager (Handler)", file);
             Bind(packager, "MaxRoutes", -1, "Max routes",
-                "Most routes one packager can have (game: 5). Above 5 the routes list in the management screen gets a scroll area." + unset,
+                "Most routes one packager can have (game: 5). Above 5 the routes list in the management screen gets extra rows and a scroll area. The rows are made when the game starts, so raising this needs a restart." + unset,
                 v => PackagerMaxRoutes = v);
             Bind(packager, "SpeedMultiplier", Setting.Unset, "Packaging speed multiplier",
                 "How fast packagers pack, 1 = game speed, 2 = twice as fast." + unset,

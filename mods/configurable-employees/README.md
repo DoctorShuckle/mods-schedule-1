@@ -29,7 +29,7 @@ sections too.
 
 | Setting | What it does |
 | ------- | ------------ |
-| `MaxRoutes` | The most routes one packager can have, 1 to 20 (game: 5). |
+| `MaxRoutes` | The most routes one packager can have, 1 to 20 (game: 5). Raising it needs a restart (see below). |
 | `SpeedMultiplier` | How fast packagers pack. `1` is the game's speed, `2` is twice as fast. Up to 100. |
 
 ### How long jobs take
@@ -163,11 +163,24 @@ numbers on screen match.
 
 ## Things to know
 
-- **More routes than the game's five** adds extra rows to the packager's management screen and makes
-  the list scrollable (mouse wheel). The mouse wheel is blocked from changing the held item while
-  that screen is open. With a controller, the extra rows are added to the game's own gamepad
-  navigation, and the list scrolls to keep the selected row in view. More than the screen's existing
-  rows for *stations* is not covered: the limit is raised, but the screen only has so many rows.
+- **More routes than the game's five** adds extra rows to the packager's management screen and puts
+  the list in a scroll area (mouse wheel). The mouse wheel is blocked from changing the held item while
+  that screen is open. The screen makes its rows once, when the game starts, so raising `MaxRoutes`
+  needs a restart, and until then a packager is held to the rows the screen has (the log says so once).
+  More than the screen's existing rows for *stations* is not covered: the limit is raised, but the
+  screen only has so many rows.
+- **With a controller (Steam Deck)**, the game's screens move between a fixed list of buttons for each
+  panel, so the extra rows are not reachable on their own. The mod adds their buttons to the panel
+  that owns the original rows' buttons, and scrolls the list to keep the selected row in view. It
+  scrolls only for a controller: a mouse selects whatever it hovers over, and scrolling then would
+  move the list under the pointer. If that panel cannot be found, the log says so at startup and the
+  extra rows will not work with a controller.
+- **A route you add but never fill in does not survive a reload.** That is the game's own behaviour:
+  the Add button makes a route with no source or destination, the game saves it, and then skips it
+  when the save loads. Set both ends before you leave the screen.
+- **A packager with routes but no bed and no stations may not be saved at all.** The game decides
+  whether to save a packager's setup by looking only at the bed and the stations, not the routes. This
+  is from reading the game's code and has not been seen in play.
 - **Job times work by changing the worker's speed**, not the game's timers. For the length of a job
   the mod multiplies the worker's work speed by the game's base time divided by yours. The work
   animation follows the speed, so a faster job also looks faster. For the botanist's jobs the change
@@ -198,9 +211,15 @@ numbers on screen match.
   The game ends most jobs with two stop calls a few milliseconds apart, so a second `Task stop` line
   saying `nothing to restore` is normal.
 
-- **The startup summary** reads like `15/15 patches applied`. A smaller number means a patch failed
+- **The startup summary** reads like `20/20 patches applied`. A smaller number means a patch failed
   and that feature is off; the line above it says which and why. After a game update this is the
   first thing to check.
+
+- **The `Routes list` and `Property` lines** are logged at every level. `Routes list now has N rows`
+  and `added N buttons … of panel '…'` show the extra rows and the controller support were set up;
+  `the original rows' buttons belong to no panel` means the controller support could not find its
+  panel. Each `Property 'code': employee capacity N, M idle point(s)` line shows a property and the
+  game's own capacity for it.
 
 - **The `GetActionDuration address` lines** (IL2CPP only) list where the game keeps the code for each
   botanist job. Several jobs sharing an address is the reason the mod does not patch the game's own
@@ -208,7 +227,7 @@ numbers on screen match.
 
 - `SkipPatches` (under `[ConfigurableEmployees_General]`) switches individual patches off. It takes
   comma-separated parts of patch names, ignoring case, and needs a game restart. The log says which
-  were skipped, for example `15/15 patches applied (1 skipped)`.
+  were skipped, for example `20/20 patches applied (1 skipped)`.
 
   | Part of name | Turns off |
   | ------------ | --------- |
@@ -222,7 +241,7 @@ numbers on screen match.
   | `MouseScrollDelta` | blocking the mouse wheel while the management screen is open |
   | `InitializeNPC` | walk speed |
   | `AssignProperty` | the stations, bins and routes limits, written when an employee is given a property (the moment the game builds their configuration) |
-  | `Employee_Start` | wage, fee and limits for employees loaded from a save |
+  | `Employee_Start` | wage, fee and walk speed as an employee starts, and their limits too when their configuration already exists |
   | `EmployeeManager_Awake` | wage, fee and limits for new hires |
 
   Example: `SkipPatches = "TaskDuration, MouseScrollDelta"`.
@@ -234,8 +253,11 @@ game does, at the point where the game creates or reads the number:
 
 - **Wage, signing fee, packing speed and the packager/botanist limits** are fields on the employee
   *template* the game clones every hire from. The mod writes them when the game creates its employee
-  manager, so every later hire (and the Fixer's price) uses them. Employees loaded from a save, and the
-  limits the game builds from fixed numbers, are set when the employee starts.
+  manager, so every later hire (and the Fixer's price) uses them. Employees loaded from a save are set
+  when the employee starts.
+- **Limits the game builds from fixed numbers** (a chemist's stations, a cleaner's bins, a packager's
+  routes) are written onto the employee's configuration. Each employee class builds that inside its own
+  `AssignProperty`, which can run after the employee starts, so the limits are written right after it.
 - **Walk speed** is set after the game initialises the employee, because the game sets it itself at
   that point.
 - **Job times** hold a work speed multiplier from the moment a job starts to the moment it ends, as
@@ -246,6 +268,9 @@ game does, at the point where the game creates or reads the number:
 - **Property capacity** is set as each property starts, and again once the scene has loaded. The
   second pass exists because the bungalow, sweatshop and the other special properties start through
   code of their own that can skip the mod's first hook.
+- **The routes screen** gets its extra rows when it first starts, by copying the last row. The buttons of
+  the copies are added to the game's gamepad panel at the same time, and a patch on the game's
+  selection event scrolls the list for a controller.
 - **Settings** are re-applied when MelonLoader reports that the preferences were loaded or saved.
 
 Every patch is a separate class and is applied on its own, so a game update that removes one method
@@ -257,11 +282,12 @@ returns the game to normal.
 Written for Schedule I version 0.4.7. If it stops working after an update, check the MelonLoader log
 for a "patch failed" message and the patch count at startup.
 
-### What has been tested in the game
+## Status
 
-Run on the IL2CPP build, under Proton on a Steam Deck:
+Not everything has been run in the game. What has, on the IL2CPP build under Proton on a Steam Deck
+(a build with 15 patches):
 
-- All 15 patches apply.
+- All 15 patches applied.
 - Wage, signing fee and walk speed.
 - The botanist's job times (soil, water, mist, additive, sow, spawn and harvest). Each finished within
   a few hundredths of a second of the time set, and a harvest scaled with the number of plants.
@@ -272,15 +298,22 @@ Run on the IL2CPP build, under Proton on a Steam Deck:
 - Property capacities. The second pass finds every property, including the ones the first hook cannot
   see, and raising the bungalow from 5 to 8 worked: the mod added the idle points and the game shows 8.
 
-Not yet confirmed in the game:
+Added since, and **not run in the game** (the build now has 20 patches):
+
+- Controller support for the extra route rows: adding their buttons to the gamepad panel, and
+  scrolling the list to the selection. It rests on an assumption (that the game's own route rows
+  belong to a panel), and the log says at startup if that did not hold.
+- Writing the stations, bins and routes limits when an employee is given a property (four patches),
+  which should apply them to employees created after the game starts.
+- Holding a packager's route limit to the rows the screen has, and scrolling only for a controller.
+
+Not yet confirmed in the game, either:
 
 - `DryingRackSecondsPerItem` and `SpawnStationSeconds`, which have not come up in play yet, and the
   effect of each worker's `MoveItemSeconds` (its jobs include walking, so the log cannot isolate it).
 - Employees standing at the idle points the mod adds, lowering a capacity, and capacities for
   properties other than the bungalow.
-- The extra route rows and scroll area, with a mouse and with a controller. The controller support
-  rests on an assumption (that the game's own route rows are listed in the screen's gamepad panel),
-  and the log says at startup if that did not hold.
+- The extra route rows and scroll area with a mouse, and whether routes beyond five reload correctly.
 - The Mono build, which compiles and passes the tests but has not been run in the game.
 
 ## For developers
@@ -298,6 +331,9 @@ only the project files). It is grouped by what it may touch:
 To **add a job time**: add a row to `Rules/TaskTimes.cs` (the setting, the game's base time and its
 text), and a line in `Game/TaskHold.cs` that maps the game's behaviour class to that row. The cfg entry
 is created from the table. If the behaviour is a new class, add its name to the canary test too.
+
+To **add a property**: add a row to `Rules/PropertyCatalog.cs` (the game's code for it, the setting name
+and the game's capacity, which the startup log shows). The cfg entry is created from the table.
 
 To build and test, from the repository root:
 

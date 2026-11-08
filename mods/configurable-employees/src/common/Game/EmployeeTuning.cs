@@ -7,6 +7,11 @@ namespace ConfigurableEmployees
     /// Writes the configured values onto employees and onto the prefabs new hires are cloned
     /// from. Every setting is absolute and unset ones change nothing, so applying twice is the
     /// same as applying once and the same code serves prefabs, new hires and live reloads.
+    ///
+    /// It is reached from three places: the employee manager (the prefabs), Employee.Start and a
+    /// settings reload (everyone), and the AssignProperty patches, which write the limits (stations,
+    /// bins, routes) right after the game builds the employee's configuration. Those limits cannot be
+    /// written earlier, because the configuration does not exist until then.
     /// </summary>
     internal static class EmployeeTuning
     {

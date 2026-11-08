@@ -24,15 +24,22 @@ using ConfigurableEmployees;
 //   * Wage, signing fee, assigned-things limits and packing speed are fields on the employee
 //     prefab. New hires are cloned from it, and the Fixer reads the signing fee from it, so
 //     writing the prefab when the game creates its EmployeeManager covers everyone hired later.
-//     Employee.Start then covers the employees a save loads, and the configuration limits that
-//     the game builds from fixed numbers.
+//     The limits the game builds from fixed numbers (chemist, cleaner, routes) live on the
+//     employee's configuration, which each employee class builds inside its own AssignProperty,
+//     so they are written right after that. Employee.Start covers the rest for employees a
+//     save loads.
 //   * Walk speed is set by the game from NPC data every time an NPC is initialised, which would
 //     overwrite an earlier change, so it is applied right after NPC.InitializeNPC.
 //   * Botanist task times: the duration methods are constant stubs that cannot be detoured on
 //     IL2CPP, so the botanist's work speed is changed from the start/stop hooks around the task.
 //     Chemist and packager tasks work the same way, from the base Behaviour lifecycle.
 //   * The Fixer's extra fee is a static method; its result is replaced.
-//   * A property's employee capacity is set before the property initialises itself.
+//   * A property's employee capacity is set before the property initialises itself, and again
+//     once the scene has loaded, because the special properties can skip the first hook.
+//   * The packager's routes screen gets extra rows cloned from the last one. For a controller
+//     the rows' buttons are added to the game's gamepad panel, and the list scrolls to follow
+//     the selection (controller only). A packager's route limit is held to the rows the screen
+//     has, since it cannot show a route it has no row for.
 //
 // The mod saves nothing: removing it returns the game to normal on the next launch. The patch
 // classes (Patches folder, one file per feature) are applied one by one (see the mod class), so
