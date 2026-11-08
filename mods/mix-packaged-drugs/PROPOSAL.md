@@ -2,24 +2,30 @@
 
 Status: **built** (compiles, tests pass), **not run in game**. Everything below comes from the Mono decompile.
 
+"As built" is current. The sections after it are the original investigation and design; where they differ
+(an event-driven unpack, a filter swap, the setting names, the host-only unpack, the patch list), "As built" wins.
+
 ## As built
 
-- The hooks are on `ItemSlot` (`DoesItemMatchHardFilters`, `GetCapacityForItem`, `SetStoredItem`), not on the
+- The hooks are on `ItemSlot` (`DoesItemMatchHardFilters`, `GetCapacityForItem`, `AddItem`, `SetStoredItem`), not on the
   station's setup or a slot event: the filter list is protected, and a managed `ItemFilter` subclass is awkward on
   IL2CPP. Each hook checks that the slot is a mixing station's product slot.
 - The inventory drag drops a stack into an empty slot without a capacity check (`ItemUIManager.EndDrag`), so a
   slot can briefly or lastingly hold more units than the stack limit. Accepted; documented in the README.
-- A package cannot be added to a slot holding unpackaged product (`CanStackWith` is false), so the slot must be
-  empty. Quick-move is safe: capacity is 0 there, so it never takes the item.
-- Output repack was added: the station remembers the packaging it last unpacked and `ItemSlot.AddItem` on the
-  output slot packs a finished mix in it when the batch divides evenly.
+- A package cannot stack on a loose stack in the game (`CanStackWith` is false), so the mod unpacks it first:
+  `AddItem` and `SetStoredItem` (a prefix on each, on whichever machine does it) swap the package for loose product, `GetCapacityForItem` asks the game for the room for the
+  unpackaged copy and divides by the package's units, and a drag onto a loose stack adds the units itself
+  (the game would swap the stacks).
+- Output repack, its remembered packaging, its file in `UserData` and the save and destroy hooks were removed:
+  the standard station's output is loose. Packing a brick out is the Brick Mixer mod's job.
 - A stack of packages dragged onto the slot is cut down by an `ItemUIManager.EndDrag` prefix, because
   `BaseItemInstance.ChangeQuantity` refuses to change a stack that is over its limit.
-- The remembered packaging is saved: `SaveManager.Save(string)` writes `UserData/MixPackagedDrugs/<save>-<hash>.txt`
-  (the game deletes unknown files from its save folder), read back on first use after a load. Keyed by the
-  station GUID and the packaging item ID.
+- The Brick Mixer's station (item ID `brickmixer`) is skipped, so the two mods do not both act on its slot.
+- The drop decision is `Packages.PlanDrop` in `Rules/`, so it is tested; locked slots and `CanDragFromSlot` are
+  honoured, and `onItemMoved` is invoked after a merge.
 - Settings are `AllowBaggies`, `AllowJars`, `AllowBricks`, `VerboseLogging`. No refund option.
-- Still unchecked in game: the product `StackLimit`, `MaxMixQuantity` on Mk1/Mk2, and multiplayer.
+- Still unchecked in game: the product `StackLimit`, `MaxMixQuantity` on Mk1/Mk2, the `SetStoredItem` swap on
+  IL2CPP, and multiplayer.
 
 ## Summary
 
@@ -100,10 +106,9 @@ right. Unpacking first avoids all of it.
 
 ## Multiplayer
 
-The host decides: the unpack happens on the server and rides the station's existing `SetStoredInstance`
-replication, so clients do not need the mod. A client without the mod cannot drop a packaged item into the slot,
-because its own filter still refuses it, so in practice the **mod is needed by whoever drops the item** (every
-player who wants to). Say so in the README.
+As built, whoever drops the item unpacks it locally and the loose result rides the game's own slot
+replication. A client without the mod cannot drop a packaged item into the slot, because its own filter still
+refuses it, so the **mod is needed by each player who wants to drop packages in**.
 
 ## Risks and open questions
 

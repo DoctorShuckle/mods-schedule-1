@@ -4,7 +4,6 @@
 global using Il2CppFishNet;
 global using Il2CppScheduleOne;
 global using Il2CppScheduleOne.DevUtilities;
-global using Il2CppScheduleOne.Persistence;
 global using Il2CppScheduleOne.ItemFramework;
 global using Il2CppScheduleOne.ObjectScripts;
 global using Il2CppScheduleOne.Product;
@@ -15,7 +14,6 @@ global using Il2CppScheduleOne.UI.Items;
 global using FishNet;
 global using ScheduleOne;
 global using ScheduleOne.DevUtilities;
-global using ScheduleOne.Persistence;
 global using ScheduleOne.ItemFramework;
 global using ScheduleOne.ObjectScripts;
 global using ScheduleOne.Product;

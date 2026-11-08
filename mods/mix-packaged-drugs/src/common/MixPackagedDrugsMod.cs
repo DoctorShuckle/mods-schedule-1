@@ -19,10 +19,10 @@ using MixPackagedDrugs;
 // How the mod works
 //
 // A mixing station refuses packaged product (baggie, jar, brick), and its mixing code counts items, not
-// units. The mod lets a packaged product into the station's product slot (PackagedProductPatches), then,
-// on the host, swaps it for the same product unpackaged: quantity times the package's units, so a brick
-// is 20 units and needs 20 mixers. After that the game's own mixing runs unchanged. The packaging is
-// used up. Nothing is saved by the mod itself.
+// units. The mod lets a packaged product into the station's product slot (PackagedProductPatches) and
+// swaps it, before the game stores or stacks it, for the same product unpackaged: quantity times the
+// package's units, so a brick is 20 units and needs 20 mixers. After that the game's own mixing runs
+// unchanged, and the output is loose. The packaging is used up. Nothing is saved by the mod itself.
 // ---------------------------------------------------------------------------------------------
 
 namespace MixPackagedDrugs

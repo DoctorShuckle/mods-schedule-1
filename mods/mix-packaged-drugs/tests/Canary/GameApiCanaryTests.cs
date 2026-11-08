@@ -29,11 +29,13 @@ namespace MixPackagedDrugs.Tests
 
             MethodInfo capacity = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "GetCapacityForItem");
             Assert.Equal(new[] { "ItemInstance", "Boolean" }, capacity.GetParameters().Select(p => p.ParameterType.Name));
+            Assert.Equal(new[] { "item", "checkPlayerFilters" }, capacity.GetParameters().Select(p => p.Name));   // the patch binds both by name
             Assert.Equal("Int32", capacity.ReturnType.Name);
             Assert.True(capacity.IsVirtual);
 
             MethodInfo store = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "SetStoredItem");
             Assert.Equal(new[] { "ItemInstance", "Boolean" }, store.GetParameters().Select(p => p.ParameterType.Name));
+            Assert.Equal("instance", store.GetParameters()[0].Name);   // the patch binds `ref instance` by name
             Assert.True(store.IsVirtual);
         }
 
@@ -80,7 +82,7 @@ namespace MixPackagedDrugs.Tests
 
         [SkippableTheory]
         [MemberData(nameof(Flavors))]
-        public void Output_and_drag_patch_targets_are_declared_once_with_the_expected_shape(string flavor)
+        public void Add_and_drag_patch_targets_are_declared_once_with_the_expected_shape(string flavor)
         {
             using GameApi game = GameApi.Open(flavor);
 
@@ -98,31 +100,28 @@ namespace MixPackagedDrugs.Tests
             Assert.Equal("Int32", GameApi.ValueType(ui, "draggedAmount", isStatic: false)?.Name);
             Assert.Equal("ItemSlotUI", GameApi.ValueType(ui, "HoveredSlot", isStatic: false)?.Name);
             Assert.Equal("ItemSlot", GameApi.ValueType(game.GameType("UI.ItemSlotUI"), "assignedSlot", isStatic: false)?.Name);
-            Assert.Equal("ItemSlot", GameApi.ValueType(game.GameType("ObjectScripts.MixingStation"), "OutputSlot", isStatic: false)?.Name);
             Assert.Equal("Int32", GameApi.ValueType(game.GameType("ItemFramework.ItemInstance"), "StackLimit", isStatic: false)?.Name);
         }
 
         [SkippableTheory]
         [MemberData(nameof(Flavors))]
-        public void Save_and_remove_patch_targets_and_the_members_for_the_memory_file_exist(string flavor)
+        public void The_stack_change_the_drop_uses_exists(string flavor)
         {
             using GameApi game = GameApi.Open(flavor);
+            MethodInfo change = GameApi.PublicMethod(game.GameType("ItemFramework.ItemSlot"), "ChangeQuantity", "Int32", "Boolean");
+            Assert.NotNull(change);
 
-            // Save() and Save(string) both exist: the patch names the string one, which the other calls.
-            System.Type saveManager = game.GameType("Persistence.SaveManager");
-            Assert.Contains(saveManager.GetMethods(GameApi.Declared), m => m.Name == "Save" && m.GetParameters().Length == 0);
-            MethodInfo save = Assert.Single(saveManager.GetMethods(GameApi.Declared), m => m.Name == "Save" && m.GetParameters().Length == 1);
-            Assert.Equal("String", save.GetParameters()[0].ParameterType.Name);
+            System.Type slot = game.GameType("ItemFramework.ItemSlot");
+            Assert.Equal("Boolean", GameApi.ValueType(slot, "IsLocked", isStatic: false)?.Name);
+            Assert.Equal("Boolean", GameApi.ValueType(slot, "IsAddLocked", isStatic: false)?.Name);
 
-            MethodInfo destroy = Assert.Single(game.GameType("ObjectScripts.MixingStation").GetMethods(GameApi.Declared), m => m.Name == "Destroy");
-            Assert.Empty(destroy.GetParameters());
-            Assert.Equal(game.IsIl2Cpp, destroy.IsPublic);
+            System.Type ui = game.GameType("UI.Items.ItemUIManager");
+            Assert.NotNull(GameApi.PublicMethod(ui, "CanDragFromSlot", "ItemSlotUI"));
+            Assert.Equal("UnityEvent", GameApi.ValueType(ui, "onItemMoved", isStatic: false)?.Name);
 
-            Assert.Equal("String", GameApi.ValueType(game.GameType("Persistence.LoadManager"), "LoadedGameFolderPath", isStatic: false)?.Name);
-            Assert.Equal("Guid", GameApi.ValueType(game.GameType("EntityFramework.BuildableItem"), "GUID", isStatic: false)?.Name);
-            Assert.Contains(game.GameType("Registry").GetMethods(BindingFlags.Public | BindingFlags.Static),
-                m => m.Name == "GetItem" && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.ReturnType.Name == "ItemDefinition");
-            Assert.Equal("String", GameApi.ValueType(game.GameType("ItemFramework.ItemDefinition"), "ID", isStatic: false)?.Name);
+            // The Brick Mixer's station is recognised by its item's ID.
+            Assert.Equal("ItemInstance", GameApi.ValueType(game.GameType("EntityFramework.BuildableItem"), "ItemInstance", isStatic: false)?.Name);
+            Assert.Equal("String", GameApi.ValueType(game.GameType("ItemFramework.ItemInstance"), "ID", isStatic: false)?.Name);
         }
     }
 }

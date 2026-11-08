@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using HarmonyLib;
-using MelonLoader.Utils;
 
 namespace MixPackagedDrugs
 {
@@ -12,13 +8,6 @@ namespace MixPackagedDrugs
     /// </summary>
     internal static class GameAccess
     {
-        // What each mixing station last received packaged, by the station's GUID: the output of its mixes is put
-        // back in this packaging. Kept on the host only. It is written to a small file of the mod's own whenever
-        // the game saves (the game deletes unknown files from its save folder, so the file lives in UserData) and
-        // read back the first time it is needed after a save is loaded.
-        private static Dictionary<string, string> _packagingByStation = new Dictionary<string, string>();
-        private static string _loadedForSave;
-
 #if !IL2CPP
         // Private on Mono; the IL2CPP proxy exposes them as public.
         private static readonly AccessTools.FieldRef<ItemUIManager, ItemSlotUI> DraggedSlotRef =
@@ -27,63 +16,6 @@ namespace MixPackagedDrugs
             AccessTools.FieldRefAccess<ItemUIManager, int>("draggedAmount");
         private static readonly System.Reflection.MethodInfo SetHoveredSlot = AccessTools.PropertySetter(typeof(ItemUIManager), "HoveredSlot");
 #endif
-
-        private static string GuidOf(MixingStation station) => station.GUID.ToString();
-
-        private static string SavePath()
-        {
-            LoadManager loads = Singleton<LoadManager>.Instance;
-            return loads == null ? string.Empty : loads.LoadedGameFolderPath ?? string.Empty;
-        }
-
-        private static string MemoryFile(string savePath)
-            => Path.Combine(MelonEnvironment.UserDataDirectory, "MixPackagedDrugs", PackagingMemory.FileNameFor(savePath));
-
-        // Starts from the file of the save that is loaded now; a different save starts from its own file.
-        private static void EnsureLoaded()
-        {
-            string savePath = SavePath();
-            if (savePath == _loadedForSave) return;
-
-            _loadedForSave = savePath;
-            _packagingByStation = new Dictionary<string, string>();
-            if (savePath.Length == 0) return;
-            try
-            {
-                string file = MemoryFile(savePath);
-                if (File.Exists(file)) _packagingByStation = PackagingMemory.Parse(File.ReadAllText(file));
-                ModLog.Verbose("Read " + _packagingByStation.Count + " remembered packagings from " + file);
-            }
-            catch (Exception ex)
-            {
-                ModLog.Warning("Could not read the remembered packagings; mixes in progress will come out loose: " + ex.Message);
-            }
-        }
-
-        /// <summary>Writes the remembered packagings for the loaded save. Called when the game saves.</summary>
-        public static void WritePackagingMemory()
-        {
-            EnsureLoaded();
-            string savePath = _loadedForSave;
-            if (string.IsNullOrEmpty(savePath)) return;
-
-            string file = MemoryFile(savePath);
-            if (_packagingByStation.Count == 0)
-            {
-                if (File.Exists(file)) File.Delete(file);
-                return;
-            }
-            Directory.CreateDirectory(Path.GetDirectoryName(file));
-            File.WriteAllText(file, PackagingMemory.Serialize(_packagingByStation));
-            ModLog.Verbose("Wrote " + _packagingByStation.Count + " remembered packagings to " + file);
-        }
-
-        /// <summary>Forgets a station's packaging; called when the station is removed.</summary>
-        public static void ForgetPackaging(MixingStation station)
-        {
-            EnsureLoaded();
-            _packagingByStation.Remove(GuidOf(station));
-        }
 
 #if IL2CPP
         // IL2CPP proxies are wrappers: a reference typed as a base class or an interface must be
@@ -101,12 +33,18 @@ namespace MixPackagedDrugs
         private static bool Same(object a, object b) => ReferenceEquals(a, b);
 #endif
 
+        // The Brick Mixer mod's station takes bricks only, with its own rules; this mod leaves it alone.
+        private const string BrickMixerId = "brickmixer";
+
+        private static bool IsBrickMixer(MixingStation station)
+            => station.ItemInstance != null && station.ItemInstance.ID == BrickMixerId;
+
         /// <summary>True when the slot is the product slot of a mixing station (not the mixer or output slot).</summary>
         public static bool IsMixerProductSlot(ItemSlot slot)
         {
             if (slot == null) return false;
             MixingStation station = As<MixingStation>(slot.SlotOwner);
-            return station != null && Same(station.ProductSlot, slot);
+            return station != null && Same(station.ProductSlot, slot) && !IsBrickMixer(station);
         }
 
         /// <summary>The item as a product, or null when it is anything else.</summary>
@@ -132,92 +70,39 @@ namespace MixPackagedDrugs
         /// <summary>True on the host (or in single player), the only machine that unpacks.</summary>
         public static bool IsServer => InstanceFinder.IsServer;
 
-        /// <summary>True when the slot is the output slot of a mixing station.</summary>
-        public static bool IsMixerOutputSlot(ItemSlot slot)
-        {
-            if (slot == null) return false;
-            MixingStation station = As<MixingStation>(slot.SlotOwner);
-            return station != null && Same(station.OutputSlot, slot);
-        }
-
         /// <summary>
-        /// Replaces a packaged stack in the slot with the same product unpackaged: quantity times the
-        /// package's units. The copy keeps the product's own subclass and quality. The slot's setter
-        /// replicates the change to the other players. The packaging is remembered for the station's output.
+        /// The same product unpackaged: quantity times the package's units. The copy keeps the product's own
+        /// subclass and quality. Null when the item is not a packaged product.
         /// </summary>
-        public static bool Unpack(ItemSlot slot)
+        public static ItemInstance Unpackaged(ItemInstance item)
         {
-            ProductItemInstance product = AsProduct(slot.ItemInstance);
-            if (product == null || product.AppliedPackaging == null) return false;
+            ProductItemInstance product = AsProduct(item);
+            if (product == null || product.AppliedPackaging == null) return null;
 
-            PackagingDefinition packaging = product.AppliedPackaging;
-            int units = Packages.Units(product.Quantity, product.Amount);
-            ProductItemInstance copy = AsProduct(product.GetCopy(units));
-            if (copy == null) return false;
+            ProductItemInstance copy = AsProduct(product.GetCopy(Packages.Units(product.Quantity, product.Amount)));
+            if (copy == null) return null;
             copy.SetPackaging(null);
-            slot.SetStoredItem(copy);
-
-            MixingStation station = As<MixingStation>(slot.SlotOwner);
-            if (station != null)
-            {
-                EnsureLoaded();
-                _packagingByStation[GuidOf(station)] = packaging.ID;
-            }
-            return true;
-        }
-
-        /// <summary>Forgets the packaging of a station whose product slot was filled with loose product.</summary>
-        public static void ForgetPackaging(ItemSlot slot)
-        {
-            MixingStation station = As<MixingStation>(slot.SlotOwner);
-            if (station != null) ForgetPackaging(station);
-        }
-
-        /// <summary>True when the slot holds a loose product (not packaged, not empty).</summary>
-        public static bool IsLooseProduct(ItemInstance item)
-        {
-            ProductItemInstance product = AsProduct(item);
-            return product != null && product.AppliedPackaging == null;
+            return copy;
         }
 
         /// <summary>
-        /// Puts a finished mix back in the packaging the station last received, when the batch fills whole
-        /// packages. Returns false (item unchanged) when there is nothing to do.
+        /// Whole packages of this item the slot has room for. The room is the game's own answer for the item
+        /// unpackaged (so a different product or quality, a lock or a full stack all give 0), divided by the
+        /// package's units. The game cannot stack a package on a loose stack, so it would answer 0 itself.
         /// </summary>
-        public static bool Repack(ItemSlot outputSlot, ref ItemInstance item, out int units, out int packages)
+        public static int PackageCapacity(ItemSlot slot, ItemInstance item, bool checkPlayerFilters)
         {
-            units = 0;
-            packages = 0;
-            ProductItemInstance product = AsProduct(item);
-            if (product == null || product.AppliedPackaging != null) return false;
-
-            MixingStation station = As<MixingStation>(outputSlot.SlotOwner);
-            if (station == null) return false;
-            EnsureLoaded();
-            if (!_packagingByStation.TryGetValue(GuidOf(station), out string packagingId)) return false;
-            PackagingDefinition packaging = As<PackagingDefinition>(Registry.GetItem(packagingId));
-            if (packaging == null)
-            {
-                ModLog.Warning("The remembered packaging \"" + packagingId + "\" is not in the game; the mix stays loose.");
-                return false;
-            }
-
-            units = product.Quantity;
-            packages = Packages.RepackQuantity(units, packaging.Quantity);
-            if (packages <= 0) return false;
-
-            ProductItemInstance copy = AsProduct(product.GetCopy(packages));
-            if (copy == null) return false;
-            copy.SetPackaging(packaging);
-            item = copy;
-            return true;
+            ItemInstance loose = Unpackaged(item);
+            if (loose == null) return 0;
+            return Packages.PackagesForRoom(slot.GetCapacityForItem(loose, checkPlayerFilters), AsProduct(item).Amount);
         }
 
         /// <summary>
         /// Called as a drag ends. A stack of packaged product dropped on a mixing station's product slot is
-        /// cut down to the whole packages that fit, or the drop is cancelled when none do or the slot holds
-        /// loose product (the game would swap the two stacks). The game itself does not check room when
-        /// the slot is empty.
+        /// cut down to the whole packages that fit, or the drop is cancelled when none do. The game itself
+        /// does not check room when the slot is empty, and would swap the two stacks when the slot holds loose
+        /// product. In that case the packages are unpacked into the loose stack here instead, and the game's
+        /// own drop is cancelled.
         /// </summary>
         public static void ClampMixerDrop(ItemUIManager ui)
         {
@@ -233,33 +118,48 @@ namespace MixPackagedDrugs
             ItemSlot source = dragged.assignedSlot;
             if (target == null || source == null || !IsMixerProductSlot(target)) return;
             if (!IsPackagedProduct(source.ItemInstance, out int amount) || !IsAllowed(amount)) return;
+            // The game's own drop does nothing in these cases; the merge below must not either.
+            if (!ui.CanDragFromSlot(dragged) || target.IsLocked || target.IsAddLocked) return;
 
-            int fit = target.ItemInstance != null
-                ? 0
-                : Packages.PackagesThatFit(source.ItemInstance.StackLimit, 0, amount);
 #if IL2CPP
             int dragging = ui.draggedAmount;
 #else
             int dragging = DraggedAmountRef(ui);
 #endif
-            if (fit <= 0)
+            int fit = PackageCapacity(target, source.ItemInstance, false);
+            switch (Packages.PlanDrop(target.ItemInstance != null, fit, dragging, out int count))
             {
+                case Packages.DropAction.Merge:
+                    // Add to the loose stack ourselves, as the game does for two stacks that match.
+                    target.ChangeQuantity(Packages.Units(count, amount));
+                    source.ChangeQuantity(-count);
+                    ModLog.Verbose("Unpacked " + count + " package(s) of " + amount + " into the mixing station's stack.");
+                    CancelDrop(ui);
+                    ui.onItemMoved?.Invoke();
+                    break;
+                case Packages.DropAction.Cancel:
+                    CancelDrop(ui);
+                    ModLog.Verbose("Cancelled a drop of packaged product: no room, or a different product, in the mixing station's product slot.");
+                    break;
+                case Packages.DropAction.Cut:
 #if IL2CPP
-                ui.HoveredSlot = null;
+                    ui.draggedAmount = count;
 #else
-                SetHoveredSlot.Invoke(ui, new object[] { null });
+                    DraggedAmountRef(ui) = count;
 #endif
-                ModLog.Verbose("Cancelled a drop of packaged product: no room in the mixing station's product slot.");
+                    ModLog.Verbose("Cut a drop of packaged product from " + dragging + " to " + count + " to fit the slot.");
+                    break;
             }
-            else if (dragging > fit)
-            {
+        }
+
+        // The game does nothing for a drag that ends over no slot.
+        private static void CancelDrop(ItemUIManager ui)
+        {
 #if IL2CPP
-                ui.draggedAmount = fit;
+            ui.HoveredSlot = null;
 #else
-                DraggedAmountRef(ui) = fit;
+            SetHoveredSlot.Invoke(ui, new object[] { null });
 #endif
-                ModLog.Verbose("Cut a drop of packaged product from " + dragging + " to " + fit + " to fit the slot.");
-            }
         }
     }
 }
