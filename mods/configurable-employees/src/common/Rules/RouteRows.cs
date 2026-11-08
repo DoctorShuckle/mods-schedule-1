@@ -12,6 +12,13 @@ namespace ConfigurableEmployees
             => Math.Max(0, Math.Min(wanted, Max) - have);
 
         /// <summary>
+        /// The routes limit to give a packager: what was asked for, but never more than the screen has
+        /// rows for (<paramref name="rows"/>, 0 while the screen has not started). The screen shows Add
+        /// until its rows are used up, so a limit above the row count offers routes it cannot display.
+        /// </summary>
+        public static int Limit(int wanted, int rows) => rows > 0 ? Math.Min(wanted, rows) : wanted;
+
+        /// <summary>
         /// How far a scroll area's content must move, in the viewport's own units, so a row stays in
         /// view. Positive means the row is above the top edge, negative below the bottom edge; the
         /// content is moved by subtracting it from its position, as the game's own panels do. A row

@@ -14,6 +14,15 @@ namespace ConfigurableEmployees.Tests
         public void Route_rows_to_add(int wanted, int have, int expected)
             => Assert.Equal(expected, RouteRows.RowsToAdd(wanted, have));
 
+        [Theory]
+        [InlineData(7, 5, 5)]      // more asked for than the screen has rows: held to the rows
+        [InlineData(7, 7, 7)]
+        [InlineData(3, 5, 3)]      // fewer is always fine
+        [InlineData(7, 0, 7)]      // screen not started yet: nothing to hold it to
+        [InlineData(20, 0, 20)]
+        public void The_limit_never_exceeds_the_rows_the_screen_has(int wanted, int rows, int expected)
+            => Assert.Equal(expected, RouteRows.Limit(wanted, rows));
+
         // The viewport spans -50..50 in these.
         [Theory]
         [InlineData(-10f, 10f, 0f)]       // fully inside: stay put

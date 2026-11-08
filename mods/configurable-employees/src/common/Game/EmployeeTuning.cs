@@ -10,6 +10,9 @@ namespace ConfigurableEmployees
     /// </summary>
     internal static class EmployeeTuning
     {
+        // Warn once that the routes limit was held to the screen's rows, not once per packager.
+        private static bool _warnedRows;
+
         private static readonly HashSet<EmployeeKind> LoggedDefaults = new HashSet<EmployeeKind>();
 
         /// <summary>
@@ -119,7 +122,13 @@ namespace ConfigurableEmployees
                 RouteListField routes = kind == EmployeeKind.Packager ? GameAccess.Routes(employee) : null;
                 if (routes != null)
                 {
-                    routes.MaxRoutes = Setting.ResolveCount(ModConfig.PackagerMaxRoutes, routes.MaxRoutes, RouteRows.Max);
+                    int wanted = Setting.ResolveCount(ModConfig.PackagerMaxRoutes, routes.MaxRoutes, RouteRows.Max);
+                    routes.MaxRoutes = RouteRows.Limit(wanted, RouteListUi.Rows);
+                    if (routes.MaxRoutes < wanted && !_warnedRows)
+                    {
+                        _warnedRows = true;
+                        ModLog.Warning("MaxRoutes is " + wanted + " but the routes screen only has " + RouteListUi.Rows + " rows, so packagers are held to " + routes.MaxRoutes + ". The rows are made when the game starts: restart to get more.");
+                    }
                     ModLog.Verbose("Packager can have " + routes.MaxRoutes + " routes.");
                 }
             }

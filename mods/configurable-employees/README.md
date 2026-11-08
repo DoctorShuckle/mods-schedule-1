@@ -137,7 +137,8 @@ the game runs only takes effect if something triggers that reload.
 
 | Setting | After a reload |
 | ------- | -------------- |
-| Wage, signing fee, walk speed, `MaxAssigned`, `MaxRoutes`, `SpeedMultiplier` | Applied at once, to everyone already hired |
+| Wage, signing fee, walk speed, `MaxAssigned`, `SpeedMultiplier` | Applied at once, to everyone already hired |
+| `MaxRoutes` | Lowering it applies at once. Raising it needs a restart: the management screen makes its rows when the game starts, and a packager is held to the rows the screen has (the log says so) |
 | Job times | From the next job each worker starts |
 | Fixer fee | At once |
 | `Verbosity` | At once |

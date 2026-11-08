@@ -178,6 +178,12 @@ namespace ConfigurableEmployees.Tests
             Assert.Equal("BaseEventData", Assert.Single(onSelect.GetParameters()).ParameterType.Name);
             Assert.Equal("Void", onSelect.ReturnType.Name);
 
+            // Scrolling is limited to a controller, using the game's own test for it.
+            MethodInfo gamepad = OnlyMethod(game.GameType("GameInput"), "GetCurrentInputDeviceIsGamepad");
+            Assert.True(gamepad.IsStatic);
+            Assert.Equal("Boolean", gamepad.ReturnType.Name);
+            Assert.Empty(gamepad.GetParameters());
+
             // Extra rows are added to the panel that already owns the original rows' buttons.
             Assert.Equal("UIPanel", FieldType(selectable, "ParentPanel"));
             Assert.Equal("RectTransform", FieldType(selectable, "RectTransform"));

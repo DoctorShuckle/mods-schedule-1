@@ -28,6 +28,13 @@ namespace ConfigurableEmployees
         /// <summary>True once the routes list has been given a scroll area, so the wheel is ours.</summary>
         public static bool Extended;
 
+        /// <summary>
+        /// How many route rows the screen has, once it has started (0 before). A packager's routes limit
+        /// is held to this, because the screen cannot show a route it has no row for. It is fixed when
+        /// the screen first starts, so raising MaxRoutes later needs a restart to show more.
+        /// </summary>
+        public static int Rows;
+
         // The scroll area made by MakeScrollable, so a selection can be scrolled into view.
         private static ScrollRect _scroll;
 
@@ -39,7 +46,11 @@ namespace ConfigurableEmployees
             for (int i = 0; i < ui.RouteEntries.Length; i++) rows.Add(ui.RouteEntries[i]);
 
             int toAdd = RouteRows.RowsToAdd(wanted, rows.Count);
-            if (toAdd == 0) return;
+            if (toAdd == 0)
+            {
+                Rows = rows.Count;
+                return;
+            }
 
             RouteEntryUI last = rows[rows.Count - 1];
             Transform contents = last.transform.parent;
@@ -64,6 +75,7 @@ namespace ConfigurableEmployees
 
             MakeScrollable(ui, contents);
             RegisterWithPanel(ui, last, added);
+            Rows = rows.Count;
             Extended = true;
             ModLog.Info("Routes list now has " + rows.Count + " rows.");
         }
@@ -100,10 +112,16 @@ namespace ConfigurableEmployees
         /// A selectable was selected (a controller moved onto it): if it is in the routes list, scroll
         /// the list so it is visible. Called for every selection in the game, so it leaves at once for
         /// anything else.
+        ///
+        /// Controller only. A mouse selects whatever it hovers over, and the game's own hover handler
+        /// passes scrollToChild: false so that hovering never moves a list under the pointer; moving it
+        /// here would make the list creep away from the cursor. The game gates its selection highlight
+        /// on the same call.
         /// </summary>
         public static void ScrollIntoView(UISelectable selectable)
         {
             if (!Extended || _scroll == null || selectable == null) return;
+            if (!GameInput.GetCurrentInputDeviceIsGamepad()) return;
 
             RectTransform content = _scroll.content;
             RectTransform viewport = _scroll.viewport;
