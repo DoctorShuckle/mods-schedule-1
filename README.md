@@ -20,9 +20,11 @@ both the **Mono** and **IL2CPP** branches of the game.
 | [Configurable Vehicles](mods/configurable-vehicles/README.md) | Tune each vehicle on its own: mass, engine power, steering, brakes, downforce, grip and trunk size. |
 | [Warehouse Access](mods/warehouse-access/README.md) | Opens the Dark Market warehouse without the knock, at every hour, once its quest is done. Optionally by rank instead. |
 | [Mix Packaged Drugs](mods/mix-packaged-drugs/README.md) | Lets baggies, jars and bricks go straight into a mixing station, one mixer per unit (a brick needs 20); the output comes out loose. |
-| [Brick Mixer](mods/brick-mixer/README.md) | A new buildable mixing station, a copy of the Mk2, that takes a brick and 20 mixers and gives a brick back. |
+| [Brick Mixer](mods/brick-mixer/README.md) | A new buildable mixing station, a copy of the Mk2, that takes 20 units of product (a brick, jars or baggies with Mix Packaged Drugs) and 20 mixers and gives a brick back. |
 | [Skip Disclaimer](mods/skip-disclaimer/README.md) | Skips the disclaimer screen shown when the game starts. |
+| [Configurable Storage](mods/configurable-storage/README.md) | Gives each storage rack, storage closet and the safe 20 slots in 2 rows by default; set the slots (1 to 20) and rows per container. |
 | [Configurable ATM](mods/configurable-atm/README.md) | Set the ATM's weekly deposit limit, switch it off, and choose the six amount buttons. |
+| [Dealers Run This Town](mods/faster-dealer-movement/README.md) | Dealers run to their deals at a speed you set (6 m/s by default) and walk normally everywhere else. |
 | [Teleport App](mods/teleport-app/README.md) | Teleport to a property, business, dealer or store from a TP app on the phone or with hotkeys. No cost, no cooldown. |
 
 ## Building
