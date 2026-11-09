@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Include="$(SrcDir)common\**\*.cs" />
+    <Compile Include="$(LibDir)shared\**\*.cs" />
   </ItemGroup>
 
   <!-- No Newtonsoft.Json: the mod stores nothing on disk. -->

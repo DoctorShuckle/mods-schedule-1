@@ -13,3 +13,6 @@ global using ScheduleOne.ObjectScripts;
 global using ScheduleOne.PlayerTasks.Tasks;
 global using ScheduleOne.Trash;
 #endif
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

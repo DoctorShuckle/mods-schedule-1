@@ -55,69 +55,17 @@ namespace ConfigurableEmployees
     /// </summary>
     public sealed class ConfigurableEmployeesMod : MelonMod
     {
-        /// <summary>
-        /// The patch classes: every type in this assembly marked [HarmonyPatch], in name order so the
-        /// log reads the same each launch. Adding a patch class to the Patches folder is enough; the
-        /// startup count in the log ("N/N patches applied") shows if one is missing.
-        /// </summary>
-        private static List<Type> FindPatches()
-        {
-            Type[] types;
-            try { types = typeof(ConfigurableEmployeesMod).Assembly.GetTypes(); }
-            // A type that cannot load (a game class that has gone) must not hide the rest.
-            catch (ReflectionTypeLoadException ex) { types = ex.Types; }
-
-            var patches = new List<Type>();
-            foreach (Type type in types)
-                if (type != null && type.IsDefined(typeof(HarmonyPatch), false)) patches.Add(type);
-            patches.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
-            return patches;
-        }
-
         public override void OnInitializeMelon()
         {
             ModLog.Init(LoggerInstance);
             ModConfig.Init();
             ModConfig.Apply();
 
-            List<Type> patches = FindPatches();
-            if (patches.Count == 0) LoggerInstance.Error("No patches found: the mod will do nothing.");
-
-            int applied = 0;
-            int skipped = 0;
-            foreach (Type patch in patches)
-            {
-                if (PatchSkips.IsSkipped(patch.Name, ModConfig.SkipPatches))
-                {
-                    LoggerInstance.Warning("Patch " + patch.Name + " skipped (SkipPatches).");
-                    skipped++;
-                    continue;
-                }
-
-                try
-                {
-                    HarmonyInstance.CreateClassProcessor(patch).Patch();
-                    applied++;
-                }
-                catch (Exception ex)
-                {
-                    // Surface this loudly: a failed patch means that feature is off.
-                    LoggerInstance.Error("Patch " + patch.Name + " failed: " + ex.Message);
-                }
-            }
+            PatchLoader.ApplyAll(this, name => PatchSkips.IsSkipped(name, ModConfig.SkipPatches));
 
             // Diagnostic: shows whether the task duration stubs share native code (IL2CPP only).
             try { FoldingCheck.Log(); }
             catch (Exception ex) { LoggerInstance.Warning("Could not read the task duration addresses: " + ex.Message); }
-
-            LoggerInstance.Msg("Configurable Employees 1.0.0 (" +
-#if IL2CPP
-                "IL2CPP" +
-#else
-                "Mono" +
-#endif
-                "): " + applied + "/" + (patches.Count - skipped) + " patches applied" +
-                (skipped > 0 ? " (" + skipped + " skipped)." : "."));
         }
 
         // Properties the Awake patch could not see (see PropertyTuning) are handled once the scene is up.

@@ -30,3 +30,6 @@ global using GamePhone = ScheduleOne.UI.Phone.Phone;
 global using UnityEngine;
 global using UnityEngine.Events;
 global using UnityEngine.UI;
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

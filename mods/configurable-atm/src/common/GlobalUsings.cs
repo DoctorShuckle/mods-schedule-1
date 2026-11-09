@@ -10,3 +10,6 @@ global using ScheduleOne.Quests;
 global using ScheduleOne.UI;
 #endif
 global using UnityEngine;
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

@@ -36,56 +36,13 @@ namespace TidyStreets
     /// </summary>
     public sealed class TidyStreetsMod : MelonMod
     {
-        /// <summary>
-        /// The patch classes: every type in this assembly marked [HarmonyPatch], in name order so the
-        /// log reads the same each launch. Adding a patch class to the Patches folder is enough; the
-        /// startup count in the log ("N/N patches applied") shows if one is missing.
-        /// </summary>
-        private static List<Type> FindPatches()
-        {
-            Type[] types;
-            try { types = typeof(TidyStreetsMod).Assembly.GetTypes(); }
-            // A type that cannot load (a game class that has gone) must not hide the rest.
-            catch (ReflectionTypeLoadException ex) { types = ex.Types; }
-
-            var patches = new List<Type>();
-            foreach (Type type in types)
-                if (type != null && type.IsDefined(typeof(HarmonyPatch), false)) patches.Add(type);
-            patches.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
-            return patches;
-        }
-
         public override void OnInitializeMelon()
         {
             ModLog.Init(LoggerInstance);
             ModConfig.Init();
             ModConfig.Apply();
 
-            List<Type> patches = FindPatches();
-            if (patches.Count == 0) LoggerInstance.Error("No patches found: the mod will do nothing.");
-
-            int applied = 0;
-            foreach (Type patch in patches)
-            {
-                try
-                {
-                    HarmonyInstance.CreateClassProcessor(patch).Patch();
-                    applied++;
-                }
-                catch (Exception ex)
-                {
-                    // Surface this loudly: a failed patch means that feature is off.
-                    LoggerInstance.Error("Patch " + patch.Name + " failed: " + ex.Message);
-                }
-            }
-
-            LoggerInstance.Msg("Tidy Streets 1.0.0 (" +
-#if IL2CPP
-                "IL2CPP" +
-#else
-                "Mono" +
-#endif
-                "): " + applied + "/" + patches.Count + " patches applied.");
+            PatchLoader.ApplyAll(this);
         }
 
         // The load manager outlives scenes but may not exist yet at startup, so try on each scene.

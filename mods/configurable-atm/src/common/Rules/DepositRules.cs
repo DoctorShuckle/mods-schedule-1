@@ -1,3 +1,4 @@
+using ModShared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,8 +31,7 @@ namespace ConfigurableAtm
         /// </summary>
         public static float Limit(float configured)
         {
-            if (float.IsNaN(configured) || float.IsInfinity(configured) || configured <= 0f) return GameLimit;
-            return Math.Min(configured, MaxLimit);
+            return Numbers.PositiveCappedOr(configured, MaxLimit, GameLimit);
         }
 
         /// <summary>

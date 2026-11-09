@@ -1,3 +1,4 @@
+using ModShared;
 using System;
 
 namespace ConfigurableEmployees
@@ -24,15 +25,15 @@ namespace ConfigurableEmployees
 
         /// <summary>Money (wage, signing fee): zero is a valid price, a negative number is "unset".</summary>
         public static float ResolveMoney(float configured, float game)
-            => configured >= 0f && !float.IsInfinity(configured) ? configured : game;
+            => Numbers.NonNegativeOr(configured, game);
 
         /// <summary>Walk speed in metres per second: positive and capped, else "unset".</summary>
         public static float ResolveSpeed(float configured, float game)
-            => configured > 0f && !float.IsInfinity(configured) ? Math.Min(configured, MaxWalkSpeed) : game;
+            => Numbers.PositiveCappedOr(configured, MaxWalkSpeed, game);
 
         /// <summary>A work-speed multiplier: positive and capped, else "unset".</summary>
         public static float ResolveMultiplier(float configured, float game)
-            => configured > 0f && !float.IsInfinity(configured) ? Math.Min(configured, MaxMultiplier) : game;
+            => Numbers.PositiveCappedOr(configured, MaxMultiplier, game);
 
         /// <summary>A whole number of things (stations, bins, routes): at least one, else "unset".</summary>
         public static int ResolveCount(int configured, int game, int max)

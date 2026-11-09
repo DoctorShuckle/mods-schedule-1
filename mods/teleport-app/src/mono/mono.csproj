@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Compile Include="$(SrcDir)common\**\*.cs" />
+    <Compile Include="$(LibDir)shared\**\*.cs" />
   </ItemGroup>
 
   

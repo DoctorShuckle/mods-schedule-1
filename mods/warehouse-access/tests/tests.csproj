@@ -15,6 +15,7 @@
   <ItemGroup>
     <!-- Add a file here only if it references no game, Unity or MelonLoader type. -->
     <Compile Include="$(SrcDir)Rules\**\*.cs" />
+    <Compile Include="$(LibDir)shared\Rules\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

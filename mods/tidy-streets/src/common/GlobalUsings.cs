@@ -9,3 +9,6 @@ global using ScheduleOne.DevUtilities;
 global using ScheduleOne.Persistence;
 global using ScheduleOne.Trash;
 #endif
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

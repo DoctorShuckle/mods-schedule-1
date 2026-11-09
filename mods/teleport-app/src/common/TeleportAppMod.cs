@@ -41,29 +41,9 @@ namespace TeleportApp
             ModConfig.Init();
             ModConfig.Apply();
 
-            List<Type> patches = FindPatches();
-            int applied = 0;
-            foreach (Type patch in patches)
-            {
-                try
-                {
-                    HarmonyInstance.CreateClassProcessor(patch).Patch();
-                    applied++;
-                }
-                catch (Exception ex)
-                {
-                    // Loud on purpose: a failed patch means the TP icon is off. The keys still work.
-                    LoggerInstance.Error("Patch " + patch.Name + " failed: " + ex.Message);
-                }
-            }
-
-            LoggerInstance.Msg("Teleport App 1.0.0 (" +
-#if IL2CPP
-                "IL2CPP" +
-#else
-                "Mono" +
-#endif
-                "): " + applied + "/" + patches.Count + " patches applied. Keys: " + ModConfig.PreviousKey + " / " + ModConfig.NextKey + " pick a place, " + ModConfig.TeleportKey + " teleports.");
+            // A failed patch means the TP icon is off; the keys still work.
+            PatchLoader.ApplyAll(this);
+            LoggerInstance.Msg("Keys: " + ModConfig.PreviousKey + " / " + ModConfig.NextKey + " pick a place, " + ModConfig.TeleportKey + " teleports.");
         }
 
         // Per-frame work, because nothing can be hooked: a key press raises no game event. The check is
@@ -84,21 +64,6 @@ namespace TeleportApp
         public override void OnPreferencesLoaded() => ModConfig.Apply();
 
         public override void OnPreferencesSaved() => ModConfig.Apply();
-
-        /// <summary>Every type in this assembly marked [HarmonyPatch], in name order so the log reads the same each launch.</summary>
-        private static List<Type> FindPatches()
-        {
-            Type[] types;
-            try { types = typeof(TeleportAppMod).Assembly.GetTypes(); }
-            // A type that cannot load (a game class that has gone) must not hide the rest.
-            catch (ReflectionTypeLoadException ex) { types = ex.Types; }
-
-            var patches = new List<Type>();
-            foreach (Type type in types)
-                if (type != null && type.IsDefined(typeof(HarmonyPatch), false)) patches.Add(type);
-            patches.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
-            return patches;
-        }
 
         private void Pick(int delta)
         {

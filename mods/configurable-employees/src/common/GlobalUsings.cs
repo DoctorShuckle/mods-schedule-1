@@ -26,3 +26,6 @@ global using ScheduleOne.Variables;
 global using GameProperty = ScheduleOne.Property.Property;
 global using Behaviours = ScheduleOne.NPCs.Behaviour;
 #endif
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

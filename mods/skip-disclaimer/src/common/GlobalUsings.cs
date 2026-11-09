@@ -6,3 +6,6 @@ global using Il2CppScheduleOne.UI.MainMenu;
 global using ScheduleOne.UI.MainMenu;
 #endif
 global using UnityEngine;
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

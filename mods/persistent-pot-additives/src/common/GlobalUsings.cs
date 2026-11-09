@@ -17,3 +17,6 @@ global using ScheduleOne.ItemFramework;
 global using ScheduleOne.ObjectScripts;
 global using ScheduleOne.Persistence;
 #endif
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

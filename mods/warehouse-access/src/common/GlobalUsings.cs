@@ -14,3 +14,6 @@ global using ScheduleOne.NPCs.CharacterClasses;
 global using ScheduleOne.Quests;
 #endif
 global using UnityEngine;
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

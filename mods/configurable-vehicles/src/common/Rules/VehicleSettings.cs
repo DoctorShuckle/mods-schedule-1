@@ -1,3 +1,4 @@
+using ModShared;
 using System;
 
 namespace ConfigurableVehicles
@@ -22,8 +23,7 @@ namespace ConfigurableVehicles
         /// </summary>
         public static float Positive(float configured, float max)
         {
-            if (float.IsNaN(configured) || float.IsInfinity(configured) || configured <= 0f) return 0f;
-            return Math.Min(configured, max);
+            return Numbers.PositiveCappedOr(configured, max, 0f);
         }
 
         /// <summary>A slot count: 0 or less means "leave the game's size", anything else is clamped to the game's range.</summary>

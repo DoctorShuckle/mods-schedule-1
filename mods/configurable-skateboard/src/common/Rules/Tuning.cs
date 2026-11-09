@@ -1,3 +1,4 @@
+using ModShared;
 using System;
 
 namespace ConfigurableSkateboard
@@ -17,15 +18,13 @@ namespace ConfigurableSkateboard
         /// </summary>
         public static float Multiplier(float configured)
         {
-            if (float.IsNaN(configured) || float.IsInfinity(configured) || configured <= 0f) return 1f;
-            return Math.Min(configured, MaxMultiplier);
+            return Numbers.PositiveCappedOr(configured, MaxMultiplier, 1f);
         }
 
         /// <summary>A multiplier for a cost. Zero is allowed (free); anything unusable falls back to 1.</summary>
         public static float CostMultiplier(float configured)
         {
-            if (float.IsNaN(configured) || float.IsInfinity(configured) || configured < 0f) return 1f;
-            return Math.Min(configured, MaxMultiplier);
+            return Numbers.NonNegativeCappedOr(configured, MaxMultiplier, 1f);
         }
 
         /// <summary>

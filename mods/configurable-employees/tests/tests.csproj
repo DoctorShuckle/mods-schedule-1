@@ -16,6 +16,7 @@
     <!-- Everything under Rules/ must reference no game, Unity or MelonLoader type; that is what
          makes it testable here, so the folder is the rule. -->
     <Compile Include="$(SrcDir)Rules\**\*.cs" />
+    <Compile Include="$(LibDir)shared\Rules\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
