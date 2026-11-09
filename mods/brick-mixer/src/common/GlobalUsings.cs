@@ -9,8 +9,6 @@ global using Il2CppScheduleOne.ObjectScripts;
 global using Il2CppScheduleOne.Persistence;
 global using Il2CppScheduleOne.Product;
 global using Il2CppScheduleOne.Product.Packaging;
-global using Il2CppScheduleOne.UI;
-global using Il2CppScheduleOne.UI.Items;
 global using Il2CppScheduleOne.UI.Shop;
 #else
 global using FishNet;
@@ -21,8 +19,9 @@ global using ScheduleOne.ObjectScripts;
 global using ScheduleOne.Persistence;
 global using ScheduleOne.Product;
 global using ScheduleOne.Product.Packaging;
-global using ScheduleOne.UI;
-global using ScheduleOne.UI.Items;
 global using ScheduleOne.UI.Shop;
 #endif
 global using UnityEngine;
+
+// Shared code compiled into every mod (see shared/).
+global using ModShared;

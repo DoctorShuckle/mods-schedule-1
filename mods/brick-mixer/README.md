@@ -1,17 +1,21 @@
 # Brick Mixer
 
-A mod for **Schedule I** that adds a new buildable, the **Brick Mixer**: a mixing station that takes a
-**brick** of product and 20 mixers, mixes them in one go, and gives the result back as a **brick**.
+A mod for **Schedule I** that adds a new buildable, the **Brick Mixer**: a mixing station that takes 20 units of
+product (a brick, or jars and baggies) and 20 mixers, mixes them in one go, and gives the result back as a
+**brick**.
 
 It is a copy of the Mixing Station Mk2, sold in the same shop. The mod saves no files of its own.
 
 ## How it works in the game
 
 - **Buy it** where the Mixing Station Mk2 is sold. It is listed next to the Mk2.
-- **Product slot:** takes bricks and nothing else. A brick is unpacked as it goes in (it becomes 20 units).
+- **Product slot:** takes loose product, and with [Mix Packaged Drugs](../mix-packaged-drugs/README.md)
+  installed also bricks, jars and baggies, which are unpacked as they go in (a brick becomes 20 units). Loose
+  product and packages stack together up to 20 units.
 - **Mixer slot:** as on any station. One mixer per unit, so a brick needs **20 mixers**.
-- **Starting:** the start button works only with a full brick and 20 mixers. There is no hands-on step.
-- **Output:** the finished batch is packed as a brick again, so you collect a brick of the mixed product.
+- **Starting:** the start button works only with 20 units of product and 20 mixers. There is no hands-on step.
+- **Output:** the finished batch is packed as a brick, whatever went in, so you collect a brick of the mixed
+  product.
 - **Chemists** can run it like a Mk2.
 
 ## Settings
@@ -23,7 +27,7 @@ Settings live in `UserData/MelonPreferences.cfg`, under `[BrickMixer]`.
 | `PriceMultiplier` | `1.5` | The Brick Mixer costs this many times the Mk2's price. Above 0 and at most 1000; anything else is logged and counts as 1.5. Applies after a restart of the game |
 | `TintColor` | `#E02626` | The color the model is tinted, as `#RRGGBB`. Red by default. A bad value is logged and counts as the default. Applies after a restart of the game |
 | `TintStrength` | `1` | From 0 (the Mk2's own colors) to 1 (fully tinted). Anything else is logged and counts as 1. Applies after a restart of the game |
-| `VerboseLogging` | `false` | Logs each step of adding the item and each brick it unpacks or packs |
+| `VerboseLogging` | `false` | Logs each step of adding the item and each brick it packs |
 
 ## Things to know
 
@@ -33,11 +37,12 @@ Settings live in `UserData/MelonPreferences.cfg`, under `[BrickMixer]`.
 - **It is red.** The model's opaque materials are copied and tinted (glass and glows are left alone, and the
   Mk2's own materials are not changed), and the shop tints its icon. The inventory icon and the hologram you
   place are the Mk2's. The instruction text on the screen still says "unpackaged product".
-- **One brick at a time.** The product slot holds 20 units, which is one brick. A stack of bricks dragged onto
-  it is cut down to the one that fits and the rest stays where it was.
-- **Packaging is used up** when the brick is unpacked, and the output comes back packed in a new brick.
-- **Another mod that opens mixing stations to packages** (such as Mix Packaged Drugs) can be installed too.
-  The Brick Mixer's own rules take priority on this station.
+- **20 units at a time.** The product slot holds 20 units, which is one brick. A package that does not fully fit
+  the room is refused, never split: a brick needs an empty slot, a jar needs room for 5.
+- **Packages need Mix Packaged Drugs.** Without it the Brick Mixer takes loose product only (it still gives a
+  brick back). The intake itself is that mod's, including its `Enabled` setting; this mod has no switch of its
+  own, because turning it off would leave Brick Mixers already in a save without their item.
+- **Packaging is used up** when a package is unpacked, and the output comes back packed in a new brick.
 
 ## Installing
 
@@ -65,14 +70,12 @@ save loads.
 | ---- | ----------------- |
 | `LoadManager.StartGame` | Copies the Mk2's item and prefab (batch of 20, no hands-on step) and adds the item to the game's registry. The game empties its registry of runtime items on each scene change, so this runs at every game start |
 | `ShopInterface.Awake` | Adds a listing for the Brick Mixer, with a tinted icon, to any shop that sells the Mk2 |
-| `ItemSlot.DoesItemMatchHardFilters` | The Brick Mixer's product slot accepts bricks only |
-| `ItemSlot.GetCapacityForItem` | Counts the room for a brick in bricks |
-| `ItemSlot.SetStoredItem` | On the host, unpacks a brick in that slot into 20 units |
 | `ItemSlot.AddItem` | On the host, packs a finished batch in the Brick Mixer's output slot as a brick |
 | `MixingStation.GetMixQuantity`, `CanStartMix` | A Brick Mixer mixes 20 units or nothing |
-| `ItemUIManager.EndDrag` | Cuts a drag of bricks onto the product slot to what fits, or cancels it |
 
-The station is told apart from every other by its item ID (`brickmixer`).
+The station is told apart from every other by its item ID (`brickmixer`). What goes into its product slot is not
+this mod's: loose product is the game's own rule, and packages come from
+[Mix Packaged Drugs](../mix-packaged-drugs/README.md), which treats every mixing station alike.
 
 ## For developers
 

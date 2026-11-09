@@ -6,10 +6,6 @@ namespace MixPackagedDrugs
     /// </summary>
     public static class Packages
     {
-        public const int BagUnits = 1;
-        public const int JarUnits = 5;
-        public const int BrickUnits = 20;
-
         /// <summary>Units in a stack of packages. A zero or negative amount counts as 1 (unpackaged).</summary>
         public static int Units(int quantity, int amount)
         {
@@ -52,21 +48,6 @@ namespace MixPackagedDrugs
             if (count == 0) return DropAction.Cancel;
             if (slotHasStack) return DropAction.Merge;
             return dragging > fit ? DropAction.Cut : DropAction.Allow;
-        }
-
-        /// <summary>
-        /// Whether the settings allow a package of this size. The three sizes the game ships have a switch;
-        /// any other size follows <c>allowOther</c>.
-        /// </summary>
-        public static bool IsAllowed(int amount, bool bags, bool jars, bool bricks, bool allowOther)
-        {
-            switch (amount)
-            {
-                case BagUnits: return bags;
-                case JarUnits: return jars;
-                case BrickUnits: return bricks;
-                default: return allowOther;
-            }
         }
     }
 }

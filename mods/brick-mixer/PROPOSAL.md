@@ -1,6 +1,7 @@
 # Brick Mixer: proposal
 
-Status: **built** (compiles, tests pass), **not run in game**. Follows from the Mix Packaged Drugs investigation.
+Status: **built** (compiles, tests pass), **not run in game**. Follows from the Mix Packaged Drugs investigation. Its product slot used to take bricks only, with its own unpack; that
+is now left to Mix Packaged Drugs (optional), so the slot takes loose product, and packages when that mod is there.
 
 ## Idea
 
@@ -26,8 +27,8 @@ only on the station's item ID, so they are plain Harmony patches.
   a batch of 20 and no hands-on step (whose ingredient spots would overflow at 20 units).
 - Shops are scene objects with a `Listings` list read in `ShopInterface.Awake`; a prefix adds a listing to any
   shop that already lists the Mk2. Which shop sells it is not in the code.
-- Stacks: a product stack is 20 units, so the slot holds one brick. `BaseItemInstance.ChangeQuantity` refuses to
-  change a stack over its limit, so a drag is cut to what fits (as in Mix Packaged Drugs).
+- Stacks: a product stack is 20 units, so the slot holds one brick's worth. Package intake (unpacking, room in
+  whole packages, the drag clamp) is Mix Packaged Drugs', which acts on every mixing station.
 - Saves: the game saves a station with its item ID and rebuilds it through `Registry`. No data of the mod's own
   is needed, because the packaging is always a brick. The cost is that uninstalling the mod loses the stations.
 
@@ -42,8 +43,6 @@ warning appears when none were. The shop listing uses the game's own `UseIconTin
 
 | Hook | Rule |
 |---|---|
-| `DoesItemMatchHardFilters`, `GetCapacityForItem` | Product slot: bricks only, counted in bricks (run last) |
-| `SetStoredItem` (host) | Unpack a brick into 20 units |
 | `GetMixQuantity`, `CanStartMix` | 20 or nothing |
 | `AddItem` on the output slot (host) | Pack a batch of 20 as a brick; the brick is the registry packaging holding 20 units |
 

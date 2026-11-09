@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Include="$(SrcDir)common\**\*.cs" />
+    <Compile Include="$(LibDir)shared\**\*.cs" />
   </ItemGroup>
 
   <!-- No Newtonsoft.Json: the mod stores nothing on disk. -->
@@ -28,8 +29,8 @@
     <Reference Include="Il2Cppmscorlib" HintPath="$(GameLibDir)Il2Cppmscorlib.dll" Private="false" />
     <Reference Include="Assembly-CSharp" HintPath="$(GameLibDir)Assembly-CSharp.dll" Private="false" />
     <Reference Include="Il2CppScheduleOne.Core" HintPath="$(GameLibDir)Il2CppScheduleOne.Core.dll" Private="false" />
-    <Reference Include="Il2CppFishNet.Runtime" HintPath="$(GameLibDir)Il2CppFishNet.Runtime.dll" Private="false" />
     <Reference Include="UnityEngine" HintPath="$(GameLibDir)UnityEngine.dll" Private="false" />
+    <Reference Include="Il2CppFishNet.Runtime" HintPath="$(GameLibDir)Il2CppFishNet.Runtime.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(GameLibDir)UnityEngine.CoreModule.dll" Private="false" />
   </ItemGroup>
 

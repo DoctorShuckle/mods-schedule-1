@@ -16,23 +16,12 @@ namespace BrickMixer.Tests
 
         [SkippableTheory]
         [MemberData(nameof(Flavors))]
-        public void ItemSlot_patch_targets_are_declared_once_with_the_expected_shape(string flavor)
+        public void AddItem_patch_target_is_declared_once_with_the_expected_shape(string flavor)
         {
             using GameApi game = GameApi.Open(flavor);
             System.Type slot = game.GameType("ItemFramework.ItemSlot");
 
             // [HarmonyPatch(typeof(X), "Name") picks the method by name alone, so each must be unique.
-            MethodInfo hard = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "DoesItemMatchHardFilters");
-            Assert.Equal(new[] { "ItemInstance" }, hard.GetParameters().Select(p => p.ParameterType.Name));
-            Assert.Equal("Boolean", hard.ReturnType.Name);
-
-            MethodInfo capacity = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "GetCapacityForItem");
-            Assert.Equal(new[] { "ItemInstance", "Boolean" }, capacity.GetParameters().Select(p => p.ParameterType.Name));
-            Assert.Equal("Int32", capacity.ReturnType.Name);
-
-            MethodInfo store = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "SetStoredItem");
-            Assert.Equal(new[] { "ItemInstance", "Boolean" }, store.GetParameters().Select(p => p.ParameterType.Name));
-
             MethodInfo add = Assert.Single(slot.GetMethods(GameApi.Declared), m => m.Name == "AddItem");
             Assert.Equal(new[] { "item", "_internal" }, add.GetParameters().Select(p => p.Name));   // the patch binds `ref item` by name
         }
@@ -59,24 +48,6 @@ namespace BrickMixer.Tests
             Assert.Equal("ItemInstance", GameApi.ValueType(game.GameType("EntityFramework.BuildableItem"), "ItemInstance", isStatic: false)?.Name);
             Assert.Equal("IItemSlotOwner", GameApi.ValueType(game.GameType("ItemFramework.ItemSlot"), "SlotOwner", isStatic: false)?.Name);
             Assert.True(game.GameType("ObjectScripts.MixingStationMk2").IsSubclassOf(station));
-        }
-
-        [SkippableTheory]
-        [MemberData(nameof(Flavors))]
-        public void Drag_patch_target_and_members_exist(string flavor)
-        {
-            using GameApi game = GameApi.Open(flavor);
-            System.Type ui = game.GameType("UI.Items.ItemUIManager");
-
-            MethodInfo endDrag = Assert.Single(ui.GetMethods(GameApi.Declared), m => m.Name == "EndDrag");
-            Assert.Empty(endDrag.GetParameters());
-            // Private on Mono, public in the IL2CPP proxy.
-            Assert.Equal(game.IsIl2Cpp, endDrag.IsPublic);
-
-            Assert.Equal("ItemSlotUI", GameApi.ValueType(ui, "draggedSlot", isStatic: false)?.Name);
-            Assert.Equal("Int32", GameApi.ValueType(ui, "draggedAmount", isStatic: false)?.Name);
-            Assert.Equal("ItemSlotUI", GameApi.ValueType(ui, "HoveredSlot", isStatic: false)?.Name);
-            Assert.Equal("ItemSlot", GameApi.ValueType(game.GameType("UI.ItemSlotUI"), "assignedSlot", isStatic: false)?.Name);
         }
 
         [SkippableTheory]
@@ -123,7 +94,6 @@ namespace BrickMixer.Tests
 
             System.Type product = game.GameType("Product.ProductItemInstance");
             Assert.Equal("PackagingDefinition", GameApi.ValueType(product, "AppliedPackaging", isStatic: false)?.Name);
-            Assert.Equal("Int32", GameApi.ValueType(product, "Amount", isStatic: false)?.Name);
             Assert.NotNull(GameApi.PublicMethod(product, "SetPackaging", "PackagingDefinition"));
             Assert.Equal("ItemInstance", GameApi.PublicMethod(product, "GetCopy", "Int32")?.ReturnType.Name);
             Assert.Equal("Int32", GameApi.ValueType(game.GameType("Product.Packaging.PackagingDefinition"), "Quantity", isStatic: false)?.Name);

@@ -14,32 +14,6 @@ namespace BrickMixer.Tests
             => Assert.Equal(expected, BrickRules.IsBrick(units));
     }
 
-    public class BatchReadyTests
-    {
-        [Theory]
-        [InlineData(20, 20, true)]
-        [InlineData(20, 19, false)]   // not enough mixers
-        [InlineData(19, 20, false)]
-        [InlineData(40, 25, true)]
-        [InlineData(0, 20, false)]
-        public void Needs_a_full_brick_and_a_full_brick_of_mixers(int product, int mixer, bool expected)
-            => Assert.Equal(expected, BrickRules.BatchReady(product, mixer));
-    }
-
-    public class BricksThatFitTests
-    {
-        [Theory]
-        [InlineData(20, 0, 1)]
-        [InlineData(20, 1, 0)]    // 19 units of room: refused, never split
-        [InlineData(40, 0, 2)]
-        [InlineData(40, 10, 1)]
-        [InlineData(20, 20, 0)]
-        [InlineData(20, 30, 0)]   // an overfull slot takes nothing
-        [InlineData(10, 0, 0)]    // a brick never fits a limit of 10
-        public void Counts_whole_bricks_only(int limit, int current, int expected)
-            => Assert.Equal(expected, BrickRules.BricksThatFit(limit, current));
-    }
-
     public class RepackBricksTests
     {
         [Theory]

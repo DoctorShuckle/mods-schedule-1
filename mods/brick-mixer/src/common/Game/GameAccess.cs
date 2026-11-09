@@ -34,15 +34,9 @@ namespace BrickMixer
 
         private static bool Same(object a, object b) => ReferenceEquals(a, b);
 
-        // Private on Mono; the IL2CPP proxy exposes them as public.
-        private static readonly AccessTools.FieldRef<ItemUIManager, ItemSlotUI> DraggedSlotRef =
-            AccessTools.FieldRefAccess<ItemUIManager, ItemSlotUI>("draggedSlot");
-        private static readonly AccessTools.FieldRef<ItemUIManager, int> DraggedAmountRef =
-            AccessTools.FieldRefAccess<ItemUIManager, int>("draggedAmount");
-        private static readonly System.Reflection.MethodInfo SetHoveredSlot = AccessTools.PropertySetter(typeof(ItemUIManager), "HoveredSlot");
 #endif
 
-        /// <summary>True on the host (or in single player), the only machine that unpacks and packs.</summary>
+        /// <summary>True on the host (or in single player), the only machine that packs.</summary>
         public static bool IsServer => InstanceFinder.IsServer;
 
         // ------------------------------------------------------------------------------------
@@ -235,43 +229,12 @@ namespace BrickMixer
 
         public static bool IsBrickMixer(object stationObject) => IsBrickMixer(As<MixingStation>(stationObject));
 
-        /// <summary>True when the slot is the product slot of a Brick Mixer.</summary>
-        public static bool IsBrickProductSlot(ItemSlot slot)
-        {
-            if (slot == null) return false;
-            MixingStation station = As<MixingStation>(slot.SlotOwner);
-            return IsBrickMixer(station) && Same(station.ProductSlot, slot);
-        }
-
         /// <summary>True when the slot is the output slot of a Brick Mixer.</summary>
         public static bool IsBrickOutputSlot(ItemSlot slot)
         {
             if (slot == null) return false;
             MixingStation station = As<MixingStation>(slot.SlotOwner);
             return IsBrickMixer(station) && Same(station.OutputSlot, slot);
-        }
-
-        /// <summary>True when the item is a product packaged as a brick.</summary>
-        public static bool IsBrickPackage(ItemInstance item)
-        {
-            ProductItemInstance product = As<ProductItemInstance>(item);
-            return product != null && product.AppliedPackaging != null && BrickRules.IsBrick(product.Amount);
-        }
-
-        /// <summary>
-        /// Replaces a brick in the slot with the same product unpackaged: 20 units for each brick. The copy
-        /// keeps the product's own subclass and quality. The slot's setter replicates it to other players.
-        /// </summary>
-        public static bool Unpack(ItemSlot slot)
-        {
-            ProductItemInstance product = As<ProductItemInstance>(slot.ItemInstance);
-            if (product == null || product.AppliedPackaging == null) return false;
-
-            ProductItemInstance copy = As<ProductItemInstance>(product.GetCopy(product.Quantity * product.Amount));
-            if (copy == null) return false;
-            copy.SetPackaging(null);
-            slot.SetStoredItem(copy);
-            return true;
         }
 
         /// <summary>Puts a finished batch back in a brick, when it is a whole number of bricks.</summary>
@@ -315,51 +278,6 @@ namespace BrickMixer
             }
             ModLog.Warning("No 20-unit packaging was found in the item registry, so a finished mix stays loose.");
             return null;
-        }
-
-        /// <summary>
-        /// Called as a drag ends. A stack of bricks dropped on a Brick Mixer's product slot is cut down to
-        /// the bricks that fit, or the drop is cancelled when none do or the slot is not empty. The game
-        /// itself does not check room when it drops into an empty slot.
-        /// </summary>
-        public static void ClampDrop(ItemUIManager ui)
-        {
-#if IL2CPP
-            ItemSlotUI dragged = ui.draggedSlot;
-#else
-            ItemSlotUI dragged = DraggedSlotRef(ui);
-#endif
-            ItemSlotUI hovered = ui.HoveredSlot;
-            if (dragged == null || hovered == null || hovered == dragged) return;
-
-            ItemSlot target = hovered.assignedSlot;
-            ItemSlot source = dragged.assignedSlot;
-            if (target == null || source == null || !IsBrickProductSlot(target) || !IsBrickPackage(source.ItemInstance)) return;
-
-            int fit = target.ItemInstance != null ? 0 : BrickRules.BricksThatFit(source.ItemInstance.StackLimit, 0);
-#if IL2CPP
-            int dragging = ui.draggedAmount;
-#else
-            int dragging = DraggedAmountRef(ui);
-#endif
-            if (fit <= 0)
-            {
-#if IL2CPP
-                ui.HoveredSlot = null;
-#else
-                SetHoveredSlot.Invoke(ui, new object[] { null });
-#endif
-                ModLog.Verbose("Cancelled a drop of bricks: no room in the Brick Mixer's product slot.");
-            }
-            else if (dragging > fit)
-            {
-#if IL2CPP
-                ui.draggedAmount = fit;
-#else
-                DraggedAmountRef(ui) = fit;
-#endif
-                ModLog.Verbose("Cut a drop of bricks from " + dragging + " to " + fit + " to fit the slot.");
-            }
         }
     }
 }

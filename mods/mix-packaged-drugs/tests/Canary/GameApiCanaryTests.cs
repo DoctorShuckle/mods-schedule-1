@@ -68,7 +68,6 @@ namespace MixPackagedDrugs.Tests
             Assert.NotNull(getCopy);
             Assert.Equal("ItemInstance", getCopy.ReturnType.Name);
 
-            Assert.Equal("Int32", GameApi.ValueType(game.GameType("Product.Packaging.PackagingDefinition"), "Quantity", isStatic: false)?.Name);
         }
 
         [SkippableTheory]
@@ -118,10 +117,6 @@ namespace MixPackagedDrugs.Tests
             System.Type ui = game.GameType("UI.Items.ItemUIManager");
             Assert.NotNull(GameApi.PublicMethod(ui, "CanDragFromSlot", "ItemSlotUI"));
             Assert.Equal("UnityEvent", GameApi.ValueType(ui, "onItemMoved", isStatic: false)?.Name);
-
-            // The Brick Mixer's station is recognised by its item's ID.
-            Assert.Equal("ItemInstance", GameApi.ValueType(game.GameType("EntityFramework.BuildableItem"), "ItemInstance", isStatic: false)?.Name);
-            Assert.Equal("String", GameApi.ValueType(game.GameType("ItemFramework.ItemInstance"), "ID", isStatic: false)?.Name);
         }
     }
 }

@@ -49,23 +49,4 @@ namespace MixPackagedDrugs.Tests
             Assert.Equal(count, n);
         }
     }
-
-    public class IsAllowedTests
-    {
-        [Theory]
-        [InlineData(1, true, false, false, true)]
-        [InlineData(1, false, true, true, false)]
-        [InlineData(5, false, true, false, true)]
-        [InlineData(5, true, false, true, false)]
-        [InlineData(20, false, false, true, true)]
-        [InlineData(20, true, true, false, false)]
-        public void Follows_the_switch_for_each_size(int amount, bool bags, bool jars, bool bricks, bool expected)
-            => Assert.Equal(expected, Packages.IsAllowed(amount, bags, jars, bricks, allowOther: false));
-
-        [Theory]
-        [InlineData(3, true, true)]
-        [InlineData(3, false, false)]
-        public void Other_sizes_follow_allowOther(int amount, bool allowOther, bool expected)
-            => Assert.Equal(expected, Packages.IsAllowed(amount, false, false, false, allowOther));
-    }
 }

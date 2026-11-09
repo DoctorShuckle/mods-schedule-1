@@ -33,18 +33,12 @@ namespace MixPackagedDrugs
         private static bool Same(object a, object b) => ReferenceEquals(a, b);
 #endif
 
-        // The Brick Mixer mod's station takes bricks only, with its own rules; this mod leaves it alone.
-        private const string BrickMixerId = "brickmixer";
-
-        private static bool IsBrickMixer(MixingStation station)
-            => station.ItemInstance != null && station.ItemInstance.ID == BrickMixerId;
-
         /// <summary>True when the slot is the product slot of a mixing station (not the mixer or output slot).</summary>
         public static bool IsMixerProductSlot(ItemSlot slot)
         {
             if (slot == null) return false;
             MixingStation station = As<MixingStation>(slot.SlotOwner);
-            return station != null && Same(station.ProductSlot, slot) && !IsBrickMixer(station);
+            return station != null && Same(station.ProductSlot, slot);
         }
 
         /// <summary>The item as a product, or null when it is anything else.</summary>
@@ -63,12 +57,8 @@ namespace MixPackagedDrugs
             return true;
         }
 
-        /// <summary>Whether the settings let a package of this many units into the slot.</summary>
-        public static bool IsAllowed(int amount)
-            => Packages.IsAllowed(amount, ModConfig.AllowBags, ModConfig.AllowJars, ModConfig.AllowBricks, allowOther: true);
-
-        /// <summary>True on the host (or in single player), the only machine that unpacks.</summary>
-        public static bool IsServer => InstanceFinder.IsServer;
+        /// <summary>Whether the mod is switched on.</summary>
+        public static bool IsEnabled => ModConfig.Enabled;
 
         /// <summary>
         /// The same product unpackaged: quantity times the package's units. The copy keeps the product's own
@@ -106,6 +96,7 @@ namespace MixPackagedDrugs
         /// </summary>
         public static void ClampMixerDrop(ItemUIManager ui)
         {
+            if (!IsEnabled) return;
 #if IL2CPP
             ItemSlotUI dragged = ui.draggedSlot;
 #else
@@ -117,7 +108,7 @@ namespace MixPackagedDrugs
             ItemSlot target = hovered.assignedSlot;
             ItemSlot source = dragged.assignedSlot;
             if (target == null || source == null || !IsMixerProductSlot(target)) return;
-            if (!IsPackagedProduct(source.ItemInstance, out int amount) || !IsAllowed(amount)) return;
+            if (!IsPackagedProduct(source.ItemInstance, out int amount)) return;
             // The game's own drop does nothing in these cases; the merge below must not either.
             if (!ui.CanDragFromSlot(dragged) || target.IsLocked || target.IsAddLocked) return;
 

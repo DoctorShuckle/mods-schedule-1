@@ -6,7 +6,7 @@ is 1 unit, a jar 5 and a brick 20, and the ratio stays one mixer per unit: a bri
 The package is unpacked as it goes in, and the station then mixes as the game always does, so the hands-on mix,
 the Chemist and the batch size are untouched. A package that goes onto loose product of the same kind (same
 product and quality) joins that stack. The output always comes out loose: the mod does not pack it again. For a
-brick out, see the [Brick Mixer](../brick-mixer/README.md) mod.
+brick out, see the [Brick Mixer](../brick-mixer/README.md) mod, which takes packages through this mod.
 
 ## Settings
 
@@ -14,9 +14,7 @@ Settings live in `UserData/MelonPreferences.cfg`, under `[MixPackagedDrugs]`.
 
 | Setting | Default | What it does |
 | ------- | ------- | ------------ |
-| `AllowBaggies` | `true` | Baggies (1 unit) may go into the product slot |
-| `AllowJars` | `true` | Jars (5 units) may go into the product slot |
-| `AllowBricks` | `true` | Bricks (20 units) may go into the product slot |
+| `Enabled` | `true` | Baggies, jars and bricks (all three, always) may go into a mixing station's product slot. `false` turns the whole mod off |
 | `VerboseLogging` | `false` | Logs each package the mod unpacks, cuts or cancels |
 
 Changes made in the preferences file while the game runs are picked up.
@@ -30,8 +28,9 @@ Changes made in the preferences file while the game runs are picked up.
   a stack of packages onto the slot with the mouse is cut down to what fits and the rest stays where it was.
 - **The output is loose.** A mixing station mixes at most `MaxMixQuantity` units at a time (10 by default; the
   real value is in the game's assets and has not been read), so a brick comes out as loose batches.
-- **Brick Mixer is left alone.** The [Brick Mixer](../brick-mixer/README.md) station is recognised by its item
-  ID and keeps its own bricks-only rules, so the two mods can be installed together (not tested).
+- **The Brick Mixer takes packages through this mod.** Its station is a mixing station like any other, so the
+  [Brick Mixer](../brick-mixer/README.md) mod needs nothing from this one except that it be installed (not tested
+  together).
 - **Brick press and packaging station are unchanged.** Only the mixing stations' product slot is opened.
 - **A drag onto a locked slot, or from a slot the game does not let you drag from, does nothing**, as in the
   game.
@@ -65,7 +64,7 @@ IL2CPP, and multiplayer.
 | ---- | ----------------- |
 | `ItemSlot.DoesItemMatchHardFilters` | Says yes to a packaged product, for a mixing station's product slot only |
 | `ItemSlot.GetCapacityForItem` | Counts the room for a packaged product in whole packages, from the game's answer for the same product unpackaged |
-| `ItemSlot.AddItem` | Swaps a package added to the product slot for the same product unpackaged, so the game stacks it with loose product (the Brick Mixer's slot is skipped) |
+| `ItemSlot.AddItem` | Swaps a package added to the product slot for the same product unpackaged, so the game stacks it with loose product |
 | `ItemSlot.SetStoredItem` | Swaps a packaged stack stored in that slot (an empty slot) for the same product unpackaged (quantity times units) |
 | `ItemUIManager.EndDrag` | Decides a drag of packages onto the product slot (`Packages.PlanDrop`): cut to the whole packages that fit, cancel, or, onto a loose stack, add the units there and cancel the game's swap |
 

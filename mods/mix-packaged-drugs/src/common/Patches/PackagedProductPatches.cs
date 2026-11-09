@@ -26,8 +26,8 @@ namespace MixPackagedDrugs
         {
             try
             {
-                if (__result || !GameAccess.IsPackagedProduct(item, out int amount)) return;
-                if (!GameAccess.IsAllowed(amount) || !GameAccess.IsMixerProductSlot(__instance)) return;
+                if (__result || !GameAccess.IsEnabled || !GameAccess.IsPackagedProduct(item, out _)) return;
+                if (!GameAccess.IsMixerProductSlot(__instance)) return;
                 __result = true;
             }
             catch (Exception ex)
@@ -45,7 +45,7 @@ namespace MixPackagedDrugs
         {
             try
             {
-                if (!GameAccess.IsPackagedProduct(item, out int amount) || !GameAccess.IsAllowed(amount)) return;
+                if (!GameAccess.IsEnabled || !GameAccess.IsPackagedProduct(item, out _)) return;
                 if (!GameAccess.IsMixerProductSlot(__instance)) return;
 
                 __result = GameAccess.PackageCapacity(__instance, item, checkPlayerFilters);
@@ -65,7 +65,7 @@ namespace MixPackagedDrugs
         {
             try
             {
-                if (!GameAccess.IsPackagedProduct(instance, out int amount) || !GameAccess.IsAllowed(amount)) return;
+                if (!GameAccess.IsEnabled || !GameAccess.IsPackagedProduct(instance, out int amount)) return;
                 if (!GameAccess.IsMixerProductSlot(__instance)) return;
 
                 ItemInstance loose = GameAccess.Unpackaged(instance);
@@ -88,8 +88,8 @@ namespace MixPackagedDrugs
         {
             try
             {
-                if (!GameAccess.IsPackagedProduct(item, out int amount)) return;
-                if (!GameAccess.IsAllowed(amount) || !GameAccess.IsMixerProductSlot(__instance)) return;
+                if (!GameAccess.IsEnabled || !GameAccess.IsPackagedProduct(item, out int amount)) return;
+                if (!GameAccess.IsMixerProductSlot(__instance)) return;
 
                 ItemInstance loose = GameAccess.Unpackaged(item);
                 if (loose == null) return;
