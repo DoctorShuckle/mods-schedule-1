@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{1822E40A-9E06-4B84-8A83-EF5F00B799EE}") = "src", "src", "{E6A51556-93AD-41FA-BB92-9A850FF677D8}"
+EndProject
+Project("{04C8A36C-C2BC-4E6B-A3C3-3723542260DE}") = "mono", "src\mono\mono.csproj", "{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3}"
+EndProject
+Project("{04C8A36C-C2BC-4E6B-A3C3-3723542260DE}") = "il2cpp", "src\il2cpp\il2cpp.csproj", "{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{83E6D97E-E9AE-4FF7-9709-AD450DF96AC3} = {E6A51556-93AD-41FA-BB92-9A850FF677D8}
+		{3DFDE80C-B975-494C-A9D2-F4C1C6B09E86} = {E6A51556-93AD-41FA-BB92-9A850FF677D8}
+	EndGlobalSection
+EndGlobal
