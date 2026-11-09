@@ -1,0 +1,23 @@
+namespace {{Pascal}} {
+    /// <summary>
+    /// Every read of or call into the game goes through here. This file holds the runtime
+    /// differences between Mono and IL2CPP, so the patches stay identical for both builds.
+    /// </summary>
+    internal static class GameAccess {
+        // A protected or private member is public on IL2CPP and needs reflection on Mono:
+        //
+        // #if !IL2CPP
+        //     // Private on Mono; the IL2CPP proxy exposes it as a public method.
+        //     private static readonly MethodInfo FooMethod =
+        //         typeof(Foo).GetMethod("Foo", BindingFlags.Instance | BindingFlags.NonPublic);
+        // #endif
+        //
+        // public static void Foo(Foo foo) {
+        // #if IL2CPP
+        //     foo.Foo();
+        // #else
+        //     FooMethod.Invoke(foo, null);
+        // #endif
+        // }
+    }
+}

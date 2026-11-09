@@ -1,0 +1,22 @@
+using System;
+using HarmonyLib;
+
+namespace {{Pascal}} {
+    /// <summary>{{what the patch changes, and when it runs}}</summary>
+    [HarmonyPatch(typeof({{GameType}}), "{{Method}}")]
+    internal static class {{GameType}}_{{Method}}_Patch {
+        private static void Postfix({{GameType}} __instance) {
+            try {
+                if (!ModConfig.Enabled) {
+                    return;
+                }
+
+                // Decide with a function from Rules/, act through GameAccess.
+                ModLog.Verbose("{{what was changed}}");
+            } catch (Exception ex) {
+                // Fail open: the game's own code path must continue.
+                ModLog.Warning("Could not {{do the thing}}: " + ex);
+            }
+        }
+    }
+}

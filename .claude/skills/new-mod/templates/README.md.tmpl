@@ -1,0 +1,51 @@
+# {{Title}}
+
+A mod for **Schedule I** that {{one sentence: what it does}}. {{Whether it does anything before it is configured.}}
+
+## Settings
+
+Settings live in `UserData/MelonPreferences.cfg`, under `[{{Pascal}}]`.
+
+| Setting | Default | What it does |
+| ------- | ------- | ------------ |
+| `Enabled` | `true` | {{what false does}} |
+| `VerboseLogging` | `false` | Logs {{what}} |
+
+{{How bad values are handled. Whether changes apply while the game runs (they do: both preference events call ModConfig.Apply).}}
+
+## Things to know
+
+- **{{Behavior a player might trip over.}}** {{Explanation.}}
+
+## Installing
+
+1. Install [MelonLoader](https://melonwiki.xyz) for Schedule I.
+2. Copy `{{Pascal}}.dll` into the game's `Mods` folder.
+3. Start the game.
+
+There is a build for each branch of the game (Mono and IL2CPP). Use the one that matches your install.
+
+## Multiplayer
+
+{{Who needs the mod: host only (and why other players do not), or every player. Say "Not tested" if it was not.}}
+
+## Status
+
+Both builds compile and pass the unit and canary tests. Neither has been run in the game yet.
+
+## How it works
+
+| Hook | What the mod does |
+| ---- | ----------------- |
+| `{{Type.Method}}` | {{effect}} |
+
+{{What is saved: "Nothing is saved, so removing the mod returns the game to normal", or what is.}}
+
+## For developers
+
+```bash
+make test MOD={{Kebab}}
+make build MOD={{Kebab}}
+```
+
+The canary tests read the game's DLLs in `lib/` and fail if a patch target has gone.

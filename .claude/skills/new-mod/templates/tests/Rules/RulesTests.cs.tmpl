@@ -1,0 +1,11 @@
+using Xunit;
+
+namespace {{Pascal}}.Tests {
+    public class {{Topic}}RulesTests {
+        [Theory]
+        [InlineData(0, 0)]   // {{say why each edge case is here}}
+        public void {{Behavior_in_a_sentence}}(int input, int expected) {
+            Assert.Equal(expected, input);
+        }
+    }
+}

@@ -1,0 +1,42 @@
+using HarmonyLib;
+using MelonLoader;
+using {{Pascal}};
+
+[assembly: MelonInfo(typeof({{Pascal}}Mod), "{{Title}}", "1.0.0", "DoctorShuckle")]
+[assembly: MelonGame("TVGS", "Schedule I")]
+#if IL2CPP
+[assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
+#else
+[assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.MONO)]
+#endif
+// Patch classes are applied one by one below, so a single missing game method cannot abort the rest.
+[assembly: HarmonyDontPatchAll]
+
+// ---------------------------------------------------------------------------------------------
+// How the mod works
+//
+// {{HowItWorks: what the game does, what the mod changes and why, in a short paragraph. Say what
+// is saved (usually nothing) and which patch classes do the work.}}
+// ---------------------------------------------------------------------------------------------
+
+namespace {{Pascal}} {
+    /// <summary>
+    /// Entry point. The mod keeps no state of its own besides its settings: see the overview above.
+    /// Folders: Game (reads and writes of game state), Patches (the Harmony patches), Rules (the
+    /// game-free decisions) and Config (settings and logging).
+    /// </summary>
+    public sealed class {{Pascal}}Mod : MelonMod {
+        public override void OnInitializeMelon() {
+            ModLog.Init(LoggerInstance);
+            ModConfig.Init();
+            ModConfig.Apply();
+
+            PatchLoader.ApplyAll(this);
+        }
+
+        // Pick up edits made in the preferences file while the game is running.
+        public override void OnPreferencesLoaded() => ModConfig.Apply();
+
+        public override void OnPreferencesSaved() => ModConfig.Apply();
+    }
+}

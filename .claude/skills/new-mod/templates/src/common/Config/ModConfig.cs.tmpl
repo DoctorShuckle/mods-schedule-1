@@ -1,0 +1,36 @@
+using MelonLoader;
+
+namespace {{Pascal}} {
+    /// <summary>
+    /// The mod's settings. They live in UserData/MelonPreferences.cfg under [{{Pascal}}].
+    /// </summary>
+    internal static class ModConfig {
+        private static MelonPreferences_Entry<bool> _enabled;
+        private static MelonPreferences_Entry<bool> _verbose;
+
+        public static bool Enabled { get; private set; } = true;
+
+        public static void Init() {
+            MelonPreferences_Category category = MelonPreferences.CreateCategory("{{Pascal}}");
+
+            // Every entry: an identifier, a default, a display name and a description that states the valid
+            // range and what happens to a value outside it.
+            _enabled = category.CreateEntry("Enabled", true, "Enabled",
+                "{{what turning this off does}}");
+            _verbose = Prefs.CreateVerbose(category, "{{what the mod logs}}. Turn on when reporting a problem.");
+        }
+
+        /// <summary>Copies the current preference values into the places the patches read them.</summary>
+        public static void Apply() {
+            if (_enabled == null) {
+                return;
+            }
+
+            Enabled = _enabled.Value;
+            Prefs.ApplyVerbose(_verbose);
+
+            // Validate through a function in Rules/ (clamp, reject NaN or non-positive) and warn with
+            // ModLog.WarnChanged, since preferences events arrive in bursts. Fall back to the game's value.
+        }
+    }
+}

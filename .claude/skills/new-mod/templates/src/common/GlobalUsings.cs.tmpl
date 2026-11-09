@@ -1,0 +1,12 @@
+// The only place the game's namespaces differ between runtimes. Everything else in this folder is
+// compiled unchanged into both the Mono and the IL2CPP build.
+#if IL2CPP
+{{IL2CPP_USINGS: one `global using Il2CppScheduleOne.X;` per game namespace the mod uses, sorted}}
+#else
+{{MONO_USINGS: the same list as `global using ScheduleOne.X;`}}
+#endif
+global using UnityEngine;
+
+// Shared code compiled into every mod (see lib/shared/).
+global using ModShared;
+global using static ModShared.Interop;

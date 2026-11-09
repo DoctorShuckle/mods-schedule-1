@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{1822E40A-9E06-4B84-8A83-EF5F00B799EE}") = "src", "src", "{{{GUID_SRC}}}"
+EndProject
+Project("{04C8A36C-C2BC-4E6B-A3C3-3723542260DE}") = "mono", "src\mono\mono.csproj", "{{{GUID_MONO}}}"
+EndProject
+Project("{04C8A36C-C2BC-4E6B-A3C3-3723542260DE}") = "il2cpp", "src\il2cpp\il2cpp.csproj", "{{{GUID_IL2CPP}}}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{{{GUID_MONO}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{GUID_MONO}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{GUID_MONO}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{GUID_MONO}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{GUID_IL2CPP}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{GUID_IL2CPP}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{GUID_IL2CPP}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{GUID_IL2CPP}}}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{{{GUID_MONO}}} = {{{GUID_SRC}}}
+		{{{GUID_IL2CPP}}} = {{{GUID_SRC}}}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,31 @@
+using System.Linq;
+using System.Reflection;
+using Xunit;
+
+namespace {{Pascal}}.Tests {
+    /// <summary>
+    /// Early warning for game updates. The mod patches game methods by name, which a compiler cannot
+    /// check. These tests read the game DLLs in lib/ and fail if a patch target has gone, so after a
+    /// game update: refresh lib/, run the tests, and you know before launching the game.
+    /// They check that members exist, not that the game still behaves as the mod assumes.
+    /// </summary>
+    public class GameApiCanaryTests {
+        public static TheoryData<string> Flavors => new TheoryData<string> { "mono", "il2cpp" };
+
+        // One test per patch class. GameType takes the path under the game namespace: "Map.DarkMarket".
+        [SkippableTheory]
+        [MemberData(nameof(Flavors))]
+        public void {{GameType}}_{{Method}}_is_declared_once_with_the_expected_shape(string flavor) {
+            using GameApi game = GameApi.Open(flavor);
+
+            // [HarmonyPatch(typeof(X), "Name") picks the method by name alone: it must be declared once.
+            MethodInfo method = Assert.Single(game.GameType("{{Namespace.GameType}}").GetMethods(GameApi.Declared),
+                m => m.Name == "{{Method}}");
+            Assert.Empty(method.GetParameters());
+            Assert.Equal("Void", method.ReturnType.Name);
+
+            // A member the mod reaches differently per runtime: assert the difference.
+            // Assert.Equal(game.IsIl2Cpp, method.IsPublic);
+        }
+    }
+}
