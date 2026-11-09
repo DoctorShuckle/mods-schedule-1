@@ -6,8 +6,9 @@ once in C# and compiled twice: **IL2CPP is the primary flavor**, **Mono** is bui
 
 ## Ground rules
 
-- All code lives in `src/common/` and compiles into both flavors. Write for IL2CPP first, then make Mono work.
-- Never commit game or MelonLoader files. `lib/`, `decompiled/`, `third-party/`, `out/`, `logs/` are gitignored.
+- All mod code lives in `src/common/` and compiles into both flavors. Code every mod needs (logging, the patch
+  loader, number checks) lives in `lib/shared/` and is compiled into each mod, so don't copy it into a mod. Write for IL2CPP first, then make Mono work.
+- Never commit game or MelonLoader files. `lib/` (except `lib/shared/`, our own code), `decompiled/`, `third-party/`, `out/`, `logs/` are gitignored.
 - Defaults should make the mod do what its name says. Ship the change on by default when that is the point of the
   mod (e.g. skip-disclaimer); use neutral defaults only when the mod has no sensible one (e.g. tuning multipliers).
 - Patches fail open. A broken patch must never break the game's own code path.
@@ -64,10 +65,19 @@ namespace are PascalCase (`ConfigurableAtm`).
 | `Patches/` | Thin `[HarmonyPatch]` classes |
 | `Game/GameAccess.cs` | Every read of or call into the game, and where the remaining `#if IL2CPP` branches live |
 | `Rules/` | Pure decisions with no game, Unity or MelonLoader types (unit-tested) |
-| `Config/ModConfig.cs`, `Config/ModLog.cs` | `MelonPreferences` entries and a logger wrapper |
+| `Config/ModConfig.cs` | `MelonPreferences` entries (logging is `ModLog` from `lib/shared/`) |
 
 Use [configurable-atm](mods/configurable-atm/src/common/ConfigurableAtmMod.cs) and
 [warehouse-access](mods/warehouse-access/src/common/WarehouseAccessMod.cs) as the templates. Copy their structure.
+
+### Shared code (`lib/shared/`)
+
+Linked source: each csproj has `<Compile Include="$(LibDir)shared\**\*.cs" />`, so every mod gets its own `internal`
+copy in namespace `ModShared` (`global using ModShared;` in `GlobalUsings.cs`) and still ships as one DLL.
+`Melon/ModLog.cs` (`Info`, `Warning`, `WarnOnce`, `Verbose`, `Trace`; `Level` 0-2 or `VerboseEnabled`),
+`Melon/PatchLoader.cs` (`PatchLoader.ApplyAll(this)`), `Rules/Numbers.cs` (game-free, also compiled into the tests:
+`PositiveOr`, `PositiveCappedOr`, `ClampOr`, ...). Anything in `Rules/` there must stay free of game, Unity and
+MelonLoader types. Rules files that use it need `using ModShared;`.
 
 ### Entry point
 
@@ -75,9 +85,8 @@ Use [configurable-atm](mods/configurable-atm/src/common/ConfigurableAtmMod.cs) a
   `[MelonPlatformDomain(...IL2CPP)]` or `...MONO` chosen with `#if`, and `[HarmonyDontPatchAll]`.
 - A header comment explains how the mod works and why.
 - `OnInitializeMelon`: `ModLog.Init(LoggerInstance)`, `ModConfig.Init()`, `ModConfig.Apply()`, then apply patches.
-- `FindPatches()` reflects over the assembly for types marked `[HarmonyPatch]` (catching `ReflectionTypeLoadException`).
-  Each is applied alone with `HarmonyInstance.CreateClassProcessor(type).Patch()` inside try/catch, then the mod
-  logs `"<Name> <ver> (IL2CPP|Mono): N/M patches applied."` so a missing method disables one feature, not the mod.
+- `PatchLoader.ApplyAll(this)` reflects over the assembly for types marked `[HarmonyPatch]`. Each is applied alone
+  inside try/catch, then it logs `"<Name> <ver> (IL2CPP|Mono): N/M patches applied."` so a missing method disables one feature, not the mod.
   Adding a patch class needs no registration.
 - `OnPreferencesLoaded` and `OnPreferencesSaved` both call `ModConfig.Apply()`, so settings change at runtime.
 

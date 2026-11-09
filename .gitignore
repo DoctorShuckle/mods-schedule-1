@@ -4,16 +4,20 @@ obj/
 __pycache__/
 Latest.log
 
-# Game, loader and other people's code: never commit.
-# Contents are ignored but the folder skeleton is kept via a README.md (a plain `lib/` rule
-# would hide the folder itself and make the README un-trackable).
-lib/**
-decompiled/**
-!lib/**/
-!decompiled/**/
+# Game and MelonLoader files: never commit. Each folder's contents are ignored but its README.md
+# stays tracked. lib/shared/ is our own code and is not listed, so it is committed.
+lib/mono/**
+lib/il2cpp/**
+lib/melonloader-mono/**
+lib/melonloader-il2cpp/**
 !lib/*/README.md
+
+# Decompiled game code: never commit (README.md files stay tracked).
+decompiled/**
+!decompiled/**/
 !decompiled/*/README.md
 
+# Other people's mods: never commit.
 third-party/
 
 # Machine-specific settings
