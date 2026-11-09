@@ -74,7 +74,10 @@ Use [configurable-atm](mods/configurable-atm/src/common/ConfigurableAtmMod.cs) a
 
 Linked source: each csproj has `<Compile Include="$(LibDir)shared\**\*.cs" />`, so every mod gets its own `internal`
 copy in namespace `ModShared` (`global using ModShared;` in `GlobalUsings.cs`) and still ships as one DLL.
-`Melon/ModLog.cs` (`Info`, `Warning`, `WarnOnce`, `Verbose`, `Trace`; `Level` 0-2 or `VerboseEnabled`),
+`Melon/ModLog.cs` (`Info`, `Warning`, `WarnOnce`, `WarnChanged` for settings checked on every preferences event,
+`Verbose`, `Trace`; `Level` 0-2 or `VerboseEnabled`), `Melon/Prefs.cs` (`CreateVerbose` and `ApplyVerbose` for the
+VerboseLogging entry), `Melon/Interop.cs` (`As<T>`, `Same`, `IdOf`: type tests and identity on both runtimes, used
+through `global using static ModShared.Interop;`),
 `Melon/PatchLoader.cs` (`PatchLoader.ApplyAll(this)`), `Rules/Numbers.cs` (game-free, also compiled into the tests:
 `PositiveOr`, `PositiveCappedOr`, `ClampOr`, ...). Anything in `Rules/` there must stay free of game, Unity and
 MelonLoader types. Rules files that use it need `using ModShared;`.
@@ -118,8 +121,8 @@ can't be shared). Patch classes should be identical on both flavors.
 |---|---|---|
 | Namespaces | `ScheduleOne.*`, `FishNet.*` | `Il2CppScheduleOne.*`, `Il2CppFishNet.*`, `Il2Cppmscorlib` |
 | Private or protected members | `AccessTools.FieldRefAccess<T,F>("name")`, `MethodInfo.Invoke` | Proxy exposes them as public: use directly |
-| Type tests | `is`, `as` | Wrapper classes: `((Il2CppObjectBase)o).TryCast<T>()` (see `GameAccess.As<T>` in configurable-employees) |
-| Identity of a game object | `RuntimeHelpers.GetHashCode` | `.Pointer.ToInt64()` |
+| Type tests | `is`, `as` | Wrapper classes: `((Il2CppObjectBase)o).TryCast<T>()`; use the shared `As<T>` |
+| Identity of a game object | `RuntimeHelpers.GetHashCode` | `.Pointer.ToInt64()`; use the shared `Same` and `IdOf` |
 | Arrays and lists | `T[]`, `System.Collections.Generic.List<T>` | `Il2CppReferenceArray<T>`, `Il2CppSystem.Collections.Generic.List<T>` |
 | Compile-time constants baked into code | Transpiler on the real IL | IL is gone: see below |
 | Target | netstandard2.1 | net6.0 + `DefineConstants IL2CPP` |

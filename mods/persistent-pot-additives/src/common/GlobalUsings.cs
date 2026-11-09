@@ -20,3 +20,4 @@ global using ScheduleOne.Persistence;
 
 // Shared code compiled into every mod (see shared/).
 global using ModShared;
+global using static ModShared.Interop;

@@ -13,24 +13,6 @@ namespace ConfigurableEmployees
     /// </summary>
     internal static class GameAccess
     {
-        // IL2CPP proxies are wrappers: `is` and `as` only see the wrapper's own class, so a base-type
-        // reference to a Chemist must be asked with TryCast. On Mono these are ordinary casts.
-#if IL2CPP
-        internal static T As<T>(object value) where T : Il2CppObjectBase => (value as Il2CppObjectBase)?.TryCast<T>();
-#else
-        internal static T As<T>(object value) where T : class => value as T;
-#endif
-
-        /// <summary>A stable identity for a game object: its native address on IL2CPP, its reference hash on Mono.</summary>
-        internal static long IdOf(object value)
-        {
-#if IL2CPP
-            return ((Il2CppObjectBase)value).Pointer.ToInt64();
-#else
-            return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value);
-#endif
-        }
-
         public static Employee AsEmployee(NPC npc) => As<Employee>(npc);
 
         public static EmployeeKind KindOf(Employee employee)

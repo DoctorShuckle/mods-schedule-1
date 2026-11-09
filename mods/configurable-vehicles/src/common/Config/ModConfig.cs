@@ -49,8 +49,7 @@ namespace ConfigurableVehicles
                 "A number from 1 to 20 sets the trunk size of every vehicle that has no TrunkSlots of its own below. Empty = as in the game. Everyone in a multiplayer game needs the same sizes, so every player must have the mod and the same settings.");
             _trunkRows = general.CreateEntry("TrunkRows", 2, "Trunk rows",
                 "How many rows the trunk screen lays the slots out in, for vehicles whose size is set: 20 slots in 2 rows is 10 across. 1 to 5.");
-            _verbose = general.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log every vehicle as it starts (its code and the game's handling values) and what the mod changes. Turn on to pick values or when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(general, "Log every vehicle as it starts (its code and the game's handling values) and what the mod changes. Turn on to pick values or when reporting a problem.");
 
             foreach (string code in Codes)
             {
@@ -88,7 +87,7 @@ namespace ConfigurableVehicles
             if (!string.IsNullOrWhiteSpace(_allTrunkSlots.Value) && AllTrunkSlots == 0)
                 ModLog.WarnOnce("TrunkSlots: '" + _allTrunkSlots.Value + "' is not a number from 1 to 20; trunks are left as in the game.");
             TrunkRows = Math.Max(VehicleSettings.MinRows, Math.Min(VehicleSettings.MaxRows, _trunkRows.Value));
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
 
             var vehicles = new Dictionary<string, VehicleOverrides>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, VehicleEntries> pair in Entries)

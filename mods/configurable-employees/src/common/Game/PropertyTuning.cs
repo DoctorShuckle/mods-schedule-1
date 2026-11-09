@@ -17,7 +17,7 @@ namespace ConfigurableEmployees
 
         public static void Apply(GameProperty property)
         {
-            if (property == null || !Handled.Add(GameAccess.IdOf(property))) return;
+            if (property == null || !Handled.Add(IdOf(property))) return;
 
             int game = property.EmployeeCapacity;
             // Always log: this is how the player finds the game's capacity, and which properties exist.

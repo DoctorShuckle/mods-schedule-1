@@ -26,8 +26,7 @@ namespace ConfigurableStorage
         public static void Init()
         {
             MelonPreferences_Category general = MelonPreferences.CreateCategory("ConfigurableStorage");
-            _verbose = general.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each container the mod resizes, with the game's own size, and list every other placeable storage item the game has. Turn on to pick values or when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(general, "Log each container the mod resizes, with the game's own size, and list every other placeable storage item the game has. Turn on to pick values or when reporting a problem.");
 
             foreach ((string id, string name) in Containers.All)
             {
@@ -46,7 +45,7 @@ namespace ConfigurableStorage
         public static void Apply()
         {
             if (_verbose == null) return;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
             try
             {
                 GameAccess.ApplyAll();

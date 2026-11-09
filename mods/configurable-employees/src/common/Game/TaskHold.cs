@@ -26,29 +26,29 @@ namespace ConfigurableEmployees
         /// </summary>
         private static TaskTime TimeOfGrowTask(Behaviours.GrowContainerBehaviour task)
         {
-            if (GameAccess.As<Behaviours.AddSoilToGrowContainerBehaviour>(task) != null) return TaskTimes.Soil;
-            if (GameAccess.As<Behaviours.WaterPotBehaviour>(task) != null) return TaskTimes.Water;
-            if (GameAccess.As<Behaviours.ApplyAdditiveToGrowContainerBehaviour>(task) != null) return TaskTimes.Additive;
-            if (GameAccess.As<Behaviours.SowSeedInPotBehaviour>(task) != null) return TaskTimes.Sow;
-            if (GameAccess.As<Behaviours.HarvestPotBehaviour>(task) != null || GameAccess.As<Behaviours.HarvestMushroomBedBehaviour>(task) != null) return TaskTimes.Harvest;
-            if (GameAccess.As<Behaviours.ApplySpawnToMushroomBedBehaviour>(task) != null) return TaskTimes.Spawn;
+            if (As<Behaviours.AddSoilToGrowContainerBehaviour>(task) != null) return TaskTimes.Soil;
+            if (As<Behaviours.WaterPotBehaviour>(task) != null) return TaskTimes.Water;
+            if (As<Behaviours.ApplyAdditiveToGrowContainerBehaviour>(task) != null) return TaskTimes.Additive;
+            if (As<Behaviours.SowSeedInPotBehaviour>(task) != null) return TaskTimes.Sow;
+            if (As<Behaviours.HarvestPotBehaviour>(task) != null || As<Behaviours.HarvestMushroomBedBehaviour>(task) != null) return TaskTimes.Harvest;
+            if (As<Behaviours.ApplySpawnToMushroomBedBehaviour>(task) != null) return TaskTimes.Spawn;
             return null;
         }
 
         /// <summary>The entry for any other timed behaviour (chemist, packager, and the botanist's racks and stations), or null.</summary>
         private static TaskTime TimeOfBehaviour(Behaviours.Behaviour behaviour, Employee employee)
         {
-            if (GameAccess.As<Behaviours.StartChemistryStationBehaviour>(behaviour) != null) return TaskTimes.ChemistryStation;
-            if (GameAccess.As<Behaviours.StartLabOvenBehaviour>(behaviour) != null) return TaskTimes.LabOvenLoad;
-            if (GameAccess.As<Behaviours.FinishLabOvenBehaviour>(behaviour) != null) return TaskTimes.LabOvenUnload;
-            if (GameAccess.As<Behaviours.StartMixingStationBehaviour>(behaviour) != null) return TaskTimes.MixingStation;
-            if (GameAccess.As<Behaviours.StartCauldronBehaviour>(behaviour) != null) return TaskTimes.Cauldron;
-            if (GameAccess.As<Behaviours.PackagingStationBehaviour>(behaviour) != null) return TaskTimes.PackagingStation;
-            if (GameAccess.As<Behaviours.BrickPressBehaviour>(behaviour) != null) return TaskTimes.BrickPress;
-            if (GameAccess.As<Behaviours.StartDryingRackBehaviour>(behaviour) != null) return TaskTimes.DryingRack;
-            if (GameAccess.As<Behaviours.UseSpawnStationBehaviour>(behaviour) != null) return TaskTimes.SpawnStation;
+            if (As<Behaviours.StartChemistryStationBehaviour>(behaviour) != null) return TaskTimes.ChemistryStation;
+            if (As<Behaviours.StartLabOvenBehaviour>(behaviour) != null) return TaskTimes.LabOvenLoad;
+            if (As<Behaviours.FinishLabOvenBehaviour>(behaviour) != null) return TaskTimes.LabOvenUnload;
+            if (As<Behaviours.StartMixingStationBehaviour>(behaviour) != null) return TaskTimes.MixingStation;
+            if (As<Behaviours.StartCauldronBehaviour>(behaviour) != null) return TaskTimes.Cauldron;
+            if (As<Behaviours.PackagingStationBehaviour>(behaviour) != null) return TaskTimes.PackagingStation;
+            if (As<Behaviours.BrickPressBehaviour>(behaviour) != null) return TaskTimes.BrickPress;
+            if (As<Behaviours.StartDryingRackBehaviour>(behaviour) != null) return TaskTimes.DryingRack;
+            if (As<Behaviours.UseSpawnStationBehaviour>(behaviour) != null) return TaskTimes.SpawnStation;
             // Several kinds of worker run this one behaviour; each has a setting of its own for it.
-            if (GameAccess.As<Behaviours.MoveItemBehaviour>(behaviour) != null) return TaskTimes.MoveItemFor(GameAccess.KindOf(employee));
+            if (As<Behaviours.MoveItemBehaviour>(behaviour) != null) return TaskTimes.MoveItemFor(GameAccess.KindOf(employee));
             return null;
         }
 
@@ -81,7 +81,7 @@ namespace ConfigurableEmployees
         public static void BeginBehaviour(Behaviours.Behaviour behaviour)
         {
             // The botanist's grow tasks have their own, more exact, hooks above.
-            if (GameAccess.As<Behaviours.GrowContainerBehaviour>(behaviour) != null) return;
+            if (As<Behaviours.GrowContainerBehaviour>(behaviour) != null) return;
             Employee employee = GameAccess.AsEmployee(behaviour.Npc);
             if (employee != null) Begin(behaviour, employee, TimeOfBehaviour(behaviour, employee));
         }
@@ -89,7 +89,7 @@ namespace ConfigurableEmployees
         /// <summary>The behaviour ended or was paused (a resume starts the hold again), so the multiplier is dropped.</summary>
         public static void EndBehaviour(Behaviours.Behaviour behaviour)
         {
-            if (GameAccess.As<Behaviours.GrowContainerBehaviour>(behaviour) != null) return;
+            if (As<Behaviours.GrowContainerBehaviour>(behaviour) != null) return;
             Employee employee = GameAccess.AsEmployee(behaviour.Npc);
             if (employee != null) End(behaviour, employee, TimeOfBehaviour(behaviour, employee), true);
         }
@@ -100,7 +100,7 @@ namespace ConfigurableEmployees
 
             // Drop any entry a task that never reached its stop call left behind.
             ClearTaskSpeed(employee);
-            if (ModLog.Level >= 2) _taskStarts[GameAccess.IdOf(behaviour)] = Time.time;
+            if (ModLog.Level >= 2) _taskStarts[IdOf(behaviour)] = Time.time;
 
             if (!time.IsSet)
             {
@@ -134,7 +134,7 @@ namespace ConfigurableEmployees
             // setting on and off.
             string span = "";
             float started;
-            long id = GameAccess.IdOf(behaviour);
+            long id = IdOf(behaviour);
             if (_taskStarts.TryGetValue(id, out started))
             {
                 string seconds = (Time.time - started).ToString("0.00");

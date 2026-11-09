@@ -43,12 +43,5 @@ namespace FasterDealerMovement
         // Recruited dealers always; cartel dealers only when the setting says so.
         private static bool Covers(NPC npc)
             => ModConfig.IncludeCartelDealers || As<CartelDealer>(npc) == null;
-
-        /// <summary>A type test that works on both runtimes (IL2CPP wrappers need TryCast, not <c>as</c>).</summary>
-#if IL2CPP
-        private static T As<T>(NPC npc) where T : Il2CppObjectBase => ((Il2CppObjectBase)npc).TryCast<T>();
-#else
-        private static T As<T>(NPC npc) where T : class => npc as T;
-#endif
     }
 }

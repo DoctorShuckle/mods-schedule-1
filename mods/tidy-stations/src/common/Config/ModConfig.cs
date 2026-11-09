@@ -37,8 +37,7 @@ namespace TidyStations
             _botanistAdditive = Trash(category, "NoBotanistAdditiveTrash", "No botanist additive trash", "the empty additive container a botanist drops");
             _botanistSeed = Trash(category, "NoBotanistSeedTrash", "No botanist seed trash", "the empty seed packet a botanist drops");
             _plantScrap = Trash(category, "NoPlantScrapTrash", "No plant scrap", "the scrap left when a plant's last harvest is taken");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each piece of trash the mod stops. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each piece of trash the mod stops. Turn on when reporting a problem.");
         }
 
         private static MelonPreferences_Entry<bool> Trash(MelonPreferences_Category category, string key, string name, string what)
@@ -56,7 +55,7 @@ namespace TidyStations
             NoBotanistAdditiveTrash = _botanistAdditive.Value;
             NoBotanistSeedTrash = _botanistSeed.Value;
             NoPlantScrapTrash = _plantScrap.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

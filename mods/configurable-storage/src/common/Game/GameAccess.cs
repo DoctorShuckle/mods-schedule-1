@@ -8,14 +8,6 @@ namespace ConfigurableStorage
     /// </summary>
     internal static class GameAccess
     {
-#if IL2CPP
-        // IL2CPP proxies are wrappers: a reference typed as a base class must be asked with TryCast.
-        private static T As<T>(object value) where T : Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase
-            => (value as Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)?.TryCast<T>();
-#else
-        private static T As<T>(object value) where T : class => value as T;
-#endif
-
         /// <summary>The game's own size of each container, read the first time it is seen, before the mod changes it.</summary>
         private static readonly Dictionary<string, (int Slots, int Rows)> GameSizes = new Dictionary<string, (int, int)>();
 

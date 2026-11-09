@@ -32,8 +32,7 @@ namespace TidyStreets
                 "true stops trash from the game's other generation volumes; false leaves it as in the game.");
             _clearOnLoad = category.CreateEntry("ClearTrashOnLoad", true, "Clear trash on load",
                 "true removes all trash in the world each time a save finishes loading (the same as the cleartrash console command), including trash you left on the ground. Only the host clears.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each spawn the mod stops and each clear. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each spawn the mod stops and each clear. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -45,7 +44,7 @@ namespace TidyStreets
             NoSpawnVolumeTrash = _spawnVolume.Value;
             NoGenerationVolumeTrash = _generationVolume.Value;
             ClearTrashOnLoad = _clearOnLoad.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

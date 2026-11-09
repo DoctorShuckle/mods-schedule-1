@@ -14,8 +14,7 @@ namespace PersistentPotAdditives
         {
             MelonPreferences_Category category = MelonPreferences.CreateCategory("PersistentPotAdditives");
 
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log every harvest-restore and replant-boost decision. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log every harvest-restore and replant-boost decision. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -23,7 +22,7 @@ namespace PersistentPotAdditives
         {
             if (_verbose == null) return;
 
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

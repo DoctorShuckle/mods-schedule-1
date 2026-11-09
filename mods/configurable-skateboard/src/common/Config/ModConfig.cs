@@ -44,8 +44,7 @@ namespace ConfigurableSkateboard
                 "Multiplies the drag that slows the board when you stop pushing. Below 1 you coast farther; above 1 you slow sooner. 1 = as in the game.");
             _slowOnTerrain = category.CreateEntry("SlowOnTerrain", true, "Slow on terrain",
                 "true keeps the game's extra drag on grass and dirt; false rides them as fast as pavement.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each board the mod tunes. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each board the mod tunes. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -60,7 +59,7 @@ namespace ConfigurableSkateboard
             DriftGrip = Tuning.Multiplier(_driftGrip.Value);
             CoastDrag = Tuning.Multiplier(_coastDrag.Value);
             SlowOnTerrain = _slowOnTerrain.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

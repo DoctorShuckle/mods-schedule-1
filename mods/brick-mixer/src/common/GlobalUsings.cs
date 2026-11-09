@@ -25,3 +25,4 @@ global using UnityEngine;
 
 // Shared code compiled into every mod (see shared/).
 global using ModShared;
+global using static ModShared.Interop;

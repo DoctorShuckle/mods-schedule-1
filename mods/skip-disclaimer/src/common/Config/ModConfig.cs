@@ -18,8 +18,7 @@ namespace SkipDisclaimer
 
             _skip = category.CreateEntry("SkipDisclaimer", true, "Skip the disclaimer",
                 "true skips the disclaimer screen shown when the game starts. false leaves the game as it is.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each time the mod skips the disclaimer. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each time the mod skips the disclaimer. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -28,7 +27,7 @@ namespace SkipDisclaimer
             if (_skip == null) return;
 
             Skip = _skip.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

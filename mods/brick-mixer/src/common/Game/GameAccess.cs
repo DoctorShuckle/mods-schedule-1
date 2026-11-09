@@ -19,23 +19,6 @@ namespace BrickMixer
         private static PackagingDefinition _brick;
         private static bool _warnedMissing;
 
-#if IL2CPP
-        // IL2CPP proxies are wrappers: a reference typed as a base class or an interface must be
-        // asked with TryCast, and compared by native pointer.
-        private static T As<T>(object value) where T : Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase
-            => (value as Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)?.TryCast<T>();
-
-        private static bool Same(object a, object b)
-            => a != null && b != null
-               && ((Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)a).Pointer
-               == ((Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)b).Pointer;
-#else
-        private static T As<T>(object value) where T : class => value as T;
-
-        private static bool Same(object a, object b) => ReferenceEquals(a, b);
-
-#endif
-
         /// <summary>True on the host (or in single player), the only machine that packs.</summary>
         public static bool IsServer => InstanceFinder.IsServer;
 

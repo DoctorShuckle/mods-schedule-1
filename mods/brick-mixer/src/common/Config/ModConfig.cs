@@ -35,8 +35,7 @@ namespace BrickMixer
                 "The color the Brick Mixer's model is tinted, as #RRGGBB. Red by default. Applies after a restart of the game.");
             _tintStrength = category.CreateEntry("TintStrength", TintRules.DefaultStrength, "Tint strength",
                 "How strongly the tint is applied, from 0 (the Mk2's own colors) to 1 (fully tinted). Applies after a restart of the game.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each step of adding the Brick Mixer and each brick it unpacks or packs. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each step of adding the Brick Mixer and each brick it unpacks or packs. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -78,7 +77,7 @@ namespace BrickMixer
                 ModLog.Warning("TintStrength " + _tintStrength.Value + " is not between 0 and 1; using " + TintRules.DefaultStrength + ".");
             }
             TintStrength = strength;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

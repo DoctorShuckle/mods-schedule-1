@@ -19,8 +19,7 @@ namespace MixPackagedDrugs
             _enabled = category.CreateEntry("Enabled", true, "Enabled",
                 "true lets baggies, jars and bricks into a mixing station's product slot, where they are unpacked. " +
                 "false turns the whole mod off.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each package the mod lets in or unpacks. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each package the mod lets in or unpacks. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -29,7 +28,7 @@ namespace MixPackagedDrugs
             if (_enabled == null) return;
 
             Enabled = _enabled.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
         }
     }
 }

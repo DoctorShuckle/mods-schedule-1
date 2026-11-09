@@ -35,8 +35,7 @@ namespace WarehouseAccess
                 "The rank name used when UseCustomRank is true, such as Hoodlum or Block_Boss.");
             _minimumTier = category.CreateEntry("MinimumTier", 1, "Minimum tier",
                 "The tier (1 to 5) used with MinimumRank when UseCustomRank is true.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each time the mod opens the door or moves Igor. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each time the mod opens the door or moves Igor. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the patches read them.</summary>
@@ -48,7 +47,7 @@ namespace WarehouseAccess
             SkipQuest = _skipQuest.Value;
             UseCustomRank = _useCustomRank.Value;
             MinimumTier = Access.Tier(_minimumTier.Value);
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
 
             if (Access.TryParseRank(_minimumRank.Value, out ERank rank))
             {

@@ -75,8 +75,7 @@ namespace TeleportApp
                 "Key that moves the pick to the next place.");
             _teleportKey = category.CreateEntry("TeleportKey", "Backslash", "Teleport key",
                 "Key that teleports to the picked place. Map a Steam Deck button to this key in Steam Input.");
-            _verbose = category.CreateEntry("VerboseLogging", false, "Verbose logging",
-                "Log each pick and teleport. Turn on when reporting a problem.");
+            _verbose = Prefs.CreateVerbose(category, "Log each pick and teleport. Turn on when reporting a problem.");
         }
 
         /// <summary>Copies the current preference values into the places the code reads them.</summary>
@@ -96,7 +95,7 @@ namespace TeleportApp
             RotationKinds = Rotation.ParseKinds(_rotationKinds.Value);
             RotationExcluded = Rotation.ParseCodes(_rotationExcluded.Value);
             EnableHotkeys = _enableHotkeys.Value;
-            ModLog.VerboseEnabled = _verbose.Value;
+            Prefs.ApplyVerbose(_verbose);
             PreviousKey = ReadKey(_previousKey, KeyCode.LeftBracket);
             NextKey = ReadKey(_nextKey, KeyCode.RightBracket);
             TeleportKey = ReadKey(_teleportKey, KeyCode.Backslash);

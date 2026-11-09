@@ -39,6 +39,21 @@ namespace ModShared
             if (Warned.Add(message)) _logger?.Warning(message);
         }
 
+        private static readonly Dictionary<string, string> LastProblem = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Logs a problem when it first appears or changes. Pass null when there is none: that forgets the
+        /// problem, so it is said again if it returns. For settings checked on every preferences event
+        /// (they arrive in bursts), where <see cref="WarnOnce"/> would never repeat a fixed-then-broken value.
+        /// </summary>
+        public static void WarnChanged(string key, string problem)
+        {
+            LastProblem.TryGetValue(key, out string last);
+            if (problem == last) return;
+            if (problem == null) LastProblem.Remove(key); else LastProblem[key] = problem;
+            if (problem != null) _logger?.Warning(problem);
+        }
+
         public static void Verbose(string message)
         {
             if (Level >= 1) _logger?.Msg("[verbose] " + message);
